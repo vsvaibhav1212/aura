@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="AURA">
+<meta name="theme-color" content="#09090B">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%234F46E5'/%3E%3Cstop offset='1' stop-color='%238B5CF6'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='180' height='180' rx='42' fill='%2309090B'/%3E%3Ccircle cx='90' cy='90' r='46' fill='url(%23g)'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<title>AURA · Emotional Wellness</title>
+<style>
+:root{
+  --indigo:#4F46E5; --purple:#8B5CF6; --lilac:#C4B5FD; --mint:#34D399; --amber:#FBBF24; --rose:#FB7185;
+  --bg:#09090B; --ink:#F6F6F9; --muted:#A7A7B4; --faint:#71717E;
+  --glass:rgba(255,255,255,.05); --glass2:rgba(255,255,255,.085);
+  --stroke:rgba(255,255,255,.10);
+  --r:26px;
+  --shadow:0 24px 70px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.07);
+  --grad:linear-gradient(135deg,#4F46E5,#8B5CF6);
+  --sp:cubic-bezier(.22,1,.36,1); --spring:cubic-bezier(.34,1.56,.64,1);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;margin:0;padding:0;}
+html,body{height:100%;}
+body{font-family:-apple-system,"SF Pro Display",Inter,system-ui,sans-serif;background:#050507;color:var(--ink);display:flex;align-items:center;justify-content:center;min-height:100vh;overflow:hidden;letter-spacing:-.011em;}
+button{font:inherit;color:inherit;}
+.stage{display:flex;gap:52px;align-items:center;justify-content:center;padding:24px;}
+.caption{max-width:250px;color:var(--muted);}
+.caption h1{font-size:26px;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent;font-weight:800;letter-spacing:-.03em;margin-bottom:8px;}
+.caption p{font-size:13.5px;line-height:1.65;}
+.caption .kbd{display:block;margin-top:16px;font-size:12px;color:var(--faint);border:1px solid var(--stroke);border-radius:14px;padding:12px 14px;line-height:1.6;}
+.caption .kbd b{color:var(--ink);}
+
+.device{position:relative;width:392px;height:824px;border-radius:58px;background:linear-gradient(160deg,#2a2a33,#0b0b0f);padding:13px;box-shadow:0 50px 130px rgba(0,0,0,.7),0 0 0 2px rgba(255,255,255,.04);flex:0 0 auto;}
+.notch{position:absolute;top:25px;left:50%;transform:translateX(-50%);width:118px;height:30px;background:#000;border-radius:20px;z-index:400;}
+.app{position:relative;width:100%;height:100%;border-radius:45px;overflow:hidden;background:var(--bg);}
+.mesh{position:absolute;inset:-25%;z-index:0;pointer-events:none;filter:blur(64px);opacity:.9;
+  background:radial-gradient(closest-side at 18% 12%,rgba(79,70,229,.6),transparent),radial-gradient(closest-side at 88% 20%,rgba(139,92,246,.45),transparent),radial-gradient(closest-side at 30% 78%,rgba(99,102,241,.4),transparent),radial-gradient(closest-side at 78% 92%,rgba(139,92,246,.35),transparent);
+  animation:drift 20s ease-in-out infinite alternate;transition:background 1.1s var(--sp);will-change:transform;}
+@keyframes drift{0%{transform:translate(0,0) scale(1);}50%{transform:translate(3%,-2.5%) scale(1.09);}100%{transform:translate(-2.5%,3%) scale(1.03);}}
+.grain{position:absolute;inset:0;z-index:1;pointer-events:none;opacity:.045;mix-blend-mode:overlay;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");}
+#fx{position:absolute;inset:0;z-index:390;pointer-events:none;}
+#particles{position:absolute;inset:0;z-index:1;pointer-events:none;}
+.statusbar{position:absolute;top:0;left:0;right:0;height:48px;display:flex;align-items:flex-end;justify-content:space-between;padding:0 32px 7px;font-size:13px;font-weight:600;z-index:60;}
+.statusbar .rr{display:flex;gap:7px;align-items:center;font-size:12px;}
+
+.view{position:absolute;inset:0;z-index:2;overflow-y:auto;overflow-x:hidden;padding:60px 22px 128px;opacity:0;transform:translateY(16px) scale(.988);pointer-events:none;transition:opacity .5s var(--sp),transform .5s var(--sp);will-change:transform,opacity;}
+.view.active{opacity:1;transform:none;pointer-events:auto;}
+.view::-webkit-scrollbar{width:0;}
+
+.display{font-size:31px;font-weight:800;letter-spacing:-.04em;line-height:1.1;}
+.h1{font-size:26px;font-weight:800;letter-spacing:-.035em;line-height:1.15;}
+.h2{font-size:19px;font-weight:700;letter-spacing:-.02em;}
+.lbl{font-size:11.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--lilac);}
+.muted{color:var(--muted);} .faint{color:var(--faint);}
+
+.card{position:relative;background:var(--glass);border:1px solid var(--stroke);border-radius:var(--r);backdrop-filter:blur(26px);-webkit-backdrop-filter:blur(26px);box-shadow:var(--shadow);padding:20px;transition:transform .35s var(--spring);overflow:hidden;}
+.card::before{content:"";position:absolute;top:0;left:8%;right:8%;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.28),transparent);}
+.card.tap:active{transform:scale(.972);}
+.press{position:relative;overflow:hidden;cursor:pointer;}
+.press:focus-visible,button:focus-visible{outline:2px solid var(--lilac);outline-offset:2px;}
+
+.btn{position:relative;overflow:hidden;border:none;border-radius:20px;padding:17px 20px;font-weight:600;font-size:15.5px;cursor:pointer;width:100%;color:#fff;letter-spacing:-.01em;transition:transform .2s var(--spring);}
+.btn:active{transform:scale(.965);}
+.btn-grad{background:var(--grad);box-shadow:0 14px 34px rgba(79,70,229,.5);}
+.btn-glass{background:var(--glass2);border:1px solid var(--stroke);backdrop-filter:blur(20px);}
+.btn-ghost{background:transparent;color:var(--muted);}
+.btn-danger{background:rgba(225,29,72,.16);border:1px solid rgba(251,113,133,.3);color:#fda4af;}
+.ripple{position:absolute;border-radius:50%;transform:scale(0);background:rgba(255,255,255,.32);animation:rip .65s ease-out;pointer-events:none;}
+@keyframes rip{to{transform:scale(4);opacity:0;}}
+
+/* splash + welcome */
+#splash,#welcome{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px 30px;}
+.orb-logo{width:140px;height:140px;border-radius:50%;background:var(--grad);position:relative;box-shadow:0 0 90px rgba(139,92,246,.65),0 0 150px rgba(79,70,229,.4);animation:pulseLogo 3.4s ease-in-out infinite;will-change:transform;}
+.orb-logo::after{content:"";position:absolute;inset:14px;border-radius:50%;background:radial-gradient(circle at 38% 32%,rgba(255,255,255,.9),transparent 55%);opacity:.85;}
+.orb-logo::before{content:"";position:absolute;inset:-14px;border-radius:50%;border:1px solid rgba(196,181,253,.3);animation:ringx 3.4s ease-in-out infinite;}
+@keyframes ringx{0%,100%{transform:scale(1);opacity:.5;}50%{transform:scale(1.14);opacity:0;}}
+@keyframes pulseLogo{0%,100%{transform:scale(1);}50%{transform:scale(1.05);}}
+.wordmark{font-size:44px;font-weight:900;letter-spacing:.34em;margin:34px 0 8px;padding-left:.34em;background:linear-gradient(120deg,#fff,#c7c2ff,#fff);-webkit-background-clip:text;background-clip:text;color:transparent;background-size:200% auto;animation:shine 4s linear infinite;}
+@keyframes shine{to{background-position:200% center;}}
+.dots{display:flex;gap:7px;margin-top:46px;}
+.dots i{width:7px;height:7px;border-radius:50%;background:var(--purple);opacity:.35;animation:load 1.2s infinite;}
+.dots i:nth-child(2){animation-delay:.2s;}.dots i:nth-child(3){animation-delay:.4s;}
+@keyframes load{0%,100%{opacity:.25;transform:scale(1);}50%{opacity:1;transform:scale(1.5);}}
+.auth-btns{width:100%;margin-top:38px;display:flex;flex-direction:column;gap:11px;}
+.gbtn{display:flex;align-items:center;justify-content:center;gap:10px;}
+.gicon{width:19px;height:19px;border-radius:4px;background:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#4285F4;}
+
+/* onboarding */
+#onboard{display:flex;flex-direction:column;padding-top:70px;}
+.ob-top{display:flex;align-items:center;gap:14px;margin-bottom:10px;}
+.progressbar{flex:1;height:5px;border-radius:5px;background:rgba(255,255,255,.09);overflow:hidden;}
+.progressbar i{display:block;height:100%;border-radius:5px;background:var(--grad);width:0;transition:width .5s var(--sp);}
+.ob-body{flex:1;display:flex;flex-direction:column;justify-content:center;}
+.ob-foot{padding-bottom:18px;}
+.field{width:100%;background:var(--glass2);border:1px solid var(--stroke);border-radius:18px;padding:17px 18px;color:var(--ink);font-size:17px;outline:none;margin-top:14px;transition:border .25s;}
+.field:focus{border-color:var(--purple);}
+.field::placeholder{color:var(--faint);}
+.goal{display:flex;align-items:center;gap:14px;background:var(--glass);border:1px solid var(--stroke);border-radius:20px;padding:16px;margin-top:11px;cursor:pointer;transition:.25s var(--spring);}
+.goal:active{transform:scale(.98);}
+.goal.on{border-color:var(--purple);background:rgba(139,92,246,.14);}
+.goal .gi{font-size:22px;}
+.goal b{font-size:15px;display:block;}
+.goal small{color:var(--muted);font-size:12px;}
+.goal .chk{margin-left:auto;width:24px;height:24px;border-radius:50%;border:1.5px solid var(--stroke);display:flex;align-items:center;justify-content:center;font-size:12px;color:transparent;transition:.25s var(--spring);}
+.goal.on .chk{background:var(--grad);border-color:transparent;color:#fff;}
+.blob{width:190px;height:190px;background:var(--grad);filter:blur(1px);animation:morph 8s ease-in-out infinite,floaty 6s ease-in-out infinite;box-shadow:0 0 100px rgba(139,92,246,.55);margin:0 auto;}
+@keyframes morph{0%,100%{border-radius:42% 58% 63% 37%/45% 45% 55% 55%;}33%{border-radius:63% 37% 42% 58%/58% 42% 58% 42%;}66%{border-radius:38% 62% 55% 45%/38% 62% 38% 62%;}}
+@keyframes floaty{0%,100%{transform:translateY(0) rotate(0);}50%{transform:translateY(-13px) rotate(6deg);}}
+
+/* today */
+.t-head{display:flex;align-items:center;justify-content:space-between;}
+.t-ava{width:44px;height:44px;border-radius:50%;background:var(--grad);border:none;font-size:17px;font-weight:800;color:#fff;cursor:pointer;box-shadow:0 8px 22px rgba(79,70,229,.45);}
+.ptr{height:0;display:flex;align-items:center;justify-content:center;overflow:hidden;transition:height .3s var(--sp);color:var(--lilac);font-size:12px;gap:8px;}
+.ptr .spin{width:16px;height:16px;border-radius:50%;border:2px solid rgba(196,181,253,.3);border-top-color:var(--lilac);animation:spin 1s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.ring{position:relative;flex:0 0 auto;}
+.ring svg{transform:rotate(-90deg);display:block;}
+.ring .val{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.ring .val b{font-size:26px;font-weight:800;letter-spacing:-.03em;}
+.ring .val small{font-size:8.5px;color:var(--muted);letter-spacing:.14em;margin-top:1px;}
+.metrics{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px;}
+.metric{display:flex;flex-direction:column;gap:7px;}
+.metric .top{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--muted);}
+.metric b{font-size:17px;font-weight:700;}
+.barwrap{height:6px;border-radius:6px;background:rgba(255,255,255,.08);overflow:hidden;}
+.fill{height:100%;border-radius:6px;background:var(--grad);width:0;transition:width 1.1s var(--sp);}
+.mini-chip{background:var(--glass2);border:1px dashed var(--stroke);color:var(--lilac);border-radius:12px;padding:7px 11px;font-size:11.5px;font-weight:600;cursor:pointer;margin:2px 6px 0 0;transition:.2s var(--spring);}
+.mini-chip:active{transform:scale(.93);}
+.moodline{display:flex;align-items:center;gap:12px;}
+.moodline .dot{width:46px;height:46px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:21px;flex:0 0 auto;}
+.rituals{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px;}
+.empty{text-align:center;padding:26px 16px;}
+.empty .em{font-size:46px;filter:drop-shadow(0 10px 26px rgba(139,92,246,.5));}
+.empty h3{font-size:19px;font-weight:700;margin:14px 0 6px;letter-spacing:-.02em;}
+.empty p{color:var(--muted);font-size:13.5px;line-height:1.55;margin-bottom:16px;}
+.skel{background:linear-gradient(100deg,rgba(255,255,255,.05) 30%,rgba(255,255,255,.13) 50%,rgba(255,255,255,.05) 70%);background-size:200% 100%;animation:shim 1.3s infinite;border-radius:14px;}
+@keyframes shim{to{background-position:-200% 0;}}
+
+/* check-in */
+#checkin{display:flex;flex-direction:column;}
+.blob-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;place-items:center;margin:auto 0;}
+.eblob{width:112px;height:112px;position:relative;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:600;font-size:14px;transition:transform .45s var(--spring);animation:morph 9s ease-in-out infinite;}
+.eblob:active{transform:scale(.9);}
+.eblob.sel{transform:scale(1.14);}
+.eblob span{position:relative;z-index:2;text-shadow:0 2px 8px rgba(0,0,0,.4);}
+.eblob::before{content:"";position:absolute;inset:0;border-radius:inherit;background:inherit;box-shadow:0 0 50px rgba(0,0,0,.4);}
+.b1{background:linear-gradient(135deg,#60A5FA,#4F46E5);} .b2{background:linear-gradient(135deg,#34D399,#059669);}
+.b3{background:linear-gradient(135deg,#A78BFA,#8B5CF6);} .b4{background:linear-gradient(135deg,#FBBF24,#F59E0B);}
+.b5{background:linear-gradient(135deg,#FB7185,#E11D48);} .b6{background:linear-gradient(135deg,#94A3B8,#475569);}
+
+/* coach */
+#coach{padding:0;display:flex;flex-direction:column;}
+.coach-head{padding:58px 22px 14px;display:flex;align-items:center;gap:14px;background:linear-gradient(180deg,rgba(79,70,229,.24),transparent);}
+.coach-av{width:44px;height:44px;border-radius:50%;background:var(--grad);box-shadow:0 0 26px rgba(139,92,246,.6);position:relative;flex:0 0 auto;}
+.coach-av::after{content:"";position:absolute;inset:9px;border-radius:50%;background:radial-gradient(circle at 38% 32%,rgba(255,255,255,.85),transparent 60%);}
+.msgs{flex:1;overflow-y:auto;padding:12px 20px 8px;display:flex;flex-direction:column;gap:12px;}
+.msgs::-webkit-scrollbar{width:0;}
+.bubble{max-width:82%;padding:13px 16px;border-radius:22px;font-size:14.5px;line-height:1.5;animation:pop .35s var(--spring);}
+@keyframes pop{from{opacity:0;transform:translateY(8px) scale(.96);}to{opacity:1;transform:none;}}
+.b-bot{align-self:flex-start;background:var(--glass2);border:1px solid var(--stroke);backdrop-filter:blur(20px);border-bottom-left-radius:7px;}
+.b-me{align-self:flex-end;background:var(--grad);border-bottom-right-radius:7px;box-shadow:0 10px 26px rgba(79,70,229,.4);}
+.typing{align-self:flex-start;display:flex;gap:5px;padding:14px 16px;background:var(--glass2);border:1px solid var(--stroke);border-radius:20px;}
+.typing i{width:7px;height:7px;border-radius:50%;background:var(--purple);animation:blink 1.3s infinite;}
+.typing i:nth-child(2){animation-delay:.2s;}.typing i:nth-child(3){animation-delay:.4s;}
+@keyframes blink{0%,60%,100%{opacity:.3;transform:translateY(0);}30%{opacity:1;transform:translateY(-4px);}}
+.quicks{display:flex;flex-wrap:wrap;gap:8px;padding:4px 20px 8px;}
+.chip{background:var(--glass2);border:1px solid var(--stroke);color:var(--ink);border-radius:18px;padding:9px 14px;font-size:12.5px;font-weight:500;cursor:pointer;transition:.2s var(--spring);}
+.chip:active{transform:scale(.94);background:rgba(139,92,246,.25);}
+.composer{display:flex;gap:10px;padding:12px 18px calc(14px + env(safe-area-inset-bottom));background:rgba(9,9,11,.6);backdrop-filter:blur(20px);border-top:1px solid var(--stroke);}
+.composer input{flex:1;background:var(--glass2);border:1px solid var(--stroke);border-radius:24px;padding:14px 18px;color:var(--ink);font-size:14px;outline:none;}
+.composer input::placeholder{color:var(--faint);}
+.composer button{width:50px;height:50px;border-radius:50%;border:none;background:var(--grad);color:#fff;font-size:19px;cursor:pointer;flex:0 0 auto;box-shadow:0 8px 22px rgba(79,70,229,.5);}
+
+/* breathe */
+#breathe{padding:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 38%,rgba(79,70,229,.3),transparent 60%),var(--bg);}
+.breath-orb{width:196px;height:196px;border-radius:50%;background:var(--grad);box-shadow:0 0 70px rgba(139,92,246,.6),inset 0 0 60px rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:600;font-size:17px;transition:transform 4s ease-in-out,box-shadow 4s ease-in-out;will-change:transform;}
+.breath-phase{margin-top:42px;font-size:23px;font-weight:600;min-height:30px;}
+.breath-count{color:var(--muted);margin-top:6px;font-size:14px;}
+.breath-actions{position:absolute;bottom:42px;left:22px;right:22px;}
+
+/* gratitude */
+.g-card{background:var(--glass);border:1px solid var(--stroke);border-radius:24px;backdrop-filter:blur(20px);padding:18px;margin-bottom:13px;}
+.g-card .prompt{color:var(--lilac);font-weight:600;font-size:13px;margin-bottom:10px;}
+.g-card textarea{width:100%;background:transparent;border:none;color:var(--ink);font:inherit;font-size:15px;resize:none;outline:none;min-height:42px;line-height:1.5;}
+.g-card textarea::placeholder{color:var(--faint);}
+.g-entry{border-left:2px solid var(--purple);padding-left:14px;margin-bottom:16px;animation:pop .4s var(--spring);}
+.g-entry .dt{font-size:10.5px;color:var(--faint);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px;}
+.g-entry p{font-size:13.5px;color:var(--muted);line-height:1.55;margin:3px 0;}
+
+/* journey */
+.seg{display:flex;gap:5px;background:var(--glass);border:1px solid var(--stroke);border-radius:16px;padding:5px;margin:16px 0;}
+.seg button{flex:1;border:none;background:transparent;color:var(--muted);font-size:12.5px;font-weight:600;padding:9px 4px;border-radius:12px;cursor:pointer;transition:.3s var(--sp);}
+.seg button.on{background:var(--grad);color:#fff;}
+.chart{display:flex;align-items:flex-end;gap:8px;height:126px;padding-top:22px;}
+.bar{flex:1;border-radius:8px 8px 5px 5px;background:var(--grad);position:relative;min-height:5px;transition:height .8s var(--spring);will-change:height;}
+.bar small{position:absolute;bottom:-20px;left:50%;transform:translateX(-50%);font-size:9.5px;color:var(--faint);white-space:nowrap;}
+.corr{display:flex;align-items:center;gap:14px;padding:13px 0;border-bottom:1px solid rgba(255,255,255,.06);}
+.corr:last-child{border-bottom:none;}
+.corr .ci{width:42px;height:42px;border-radius:14px;background:var(--glass2);display:flex;align-items:center;justify-content:center;font-size:19px;flex:0 0 auto;}
+.corr b{font-size:13.5px;display:block;}
+.corr small{color:var(--muted);font-size:11.5px;line-height:1.4;display:block;margin-top:2px;}
+.badge{margin-left:auto;flex:0 0 auto;font-size:10px;font-weight:700;letter-spacing:.06em;border-radius:9px;padding:5px 9px;}
+.bd-strong{background:rgba(52,211,153,.16);color:#6ee7b7;}
+.bd-mod{background:rgba(251,191,36,.14);color:#fcd34d;}
+.bd-lock{background:rgba(255,255,255,.08);color:var(--faint);}
+.reflect{font-size:14px;line-height:1.65;color:var(--ink);}
+.reflect .hl{color:var(--lilac);font-weight:600;}
+.delta{font-size:11.5px;font-weight:700;border-radius:9px;padding:4px 9px;}
+.d-up{background:rgba(52,211,153,.16);color:#6ee7b7;}
+.d-dn{background:rgba(251,113,133,.14);color:#fda4af;}
+.tl-item{display:flex;gap:14px;padding:11px 0;border-bottom:1px solid rgba(255,255,255,.06);}
+.tl-item:last-child{border-bottom:none;}
+.tl-item .tdot{width:38px;height:38px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:17px;background:var(--glass2);flex:0 0 auto;}
+.tl-item b{font-size:13.5px;display:block;}
+.tl-item small{color:var(--muted);font-size:11.5px;}
+
+/* profile */
+.p-head{display:flex;align-items:center;gap:16px;}
+.avatar{width:70px;height:70px;border-radius:50%;background:var(--grad);box-shadow:0 0 36px rgba(139,92,246,.5);position:relative;flex:0 0 auto;}
+.avatar span{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:27px;font-weight:800;}
+.tree-card{text-align:center;padding:20px;}
+.tree{font-size:64px;line-height:1;filter:drop-shadow(0 8px 30px rgba(139,92,246,.5));animation:floaty 7s ease-in-out infinite;}
+.ach-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:11px;margin-top:6px;}
+.ach{aspect-ratio:1;border-radius:20px;background:var(--glass);border:1px solid var(--stroke);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;backdrop-filter:blur(16px);transition:.4s var(--spring);}
+.ach.locked{opacity:.32;}
+.ach .em{font-size:25px;} .ach small{font-size:9.5px;color:var(--muted);text-align:center;padding:0 4px;}
+.rowbtn{display:flex;align-items:center;gap:14px;padding:15px 4px;border-bottom:1px solid rgba(255,255,255,.07);width:100%;background:none;border-left:none;border-right:none;border-top:none;cursor:pointer;text-align:left;}
+.rowbtn:last-child{border-bottom:none;}
+.rowbtn .ic{width:38px;height:38px;border-radius:12px;background:var(--glass2);display:flex;align-items:center;justify-content:center;font-size:16px;flex:0 0 auto;}
+.rowbtn .nm{flex:1;font-size:14.5px;color:var(--ink);}
+.rowbtn .arr{color:var(--faint);font-size:15px;}
+.rowbtn .val{color:var(--muted);font-size:12.5px;}
+.toggle{width:48px;height:28px;border-radius:16px;background:var(--grad);position:relative;cursor:pointer;flex:0 0 auto;transition:.3s;border:none;}
+.toggle.off{background:rgba(255,255,255,.12);}
+.toggle i{position:absolute;top:3px;left:23px;width:22px;height:22px;border-radius:50%;background:#fff;transition:.3s var(--spring);}
+.toggle.off i{left:3px;}
+
+/* support */
+#support{background:radial-gradient(circle at 50% 18%,rgba(139,92,246,.18),transparent 55%),var(--bg);}
+.sos-hold{width:200px;height:200px;border-radius:50%;margin:14px auto 8px;position:relative;display:flex;align-items:center;justify-content:center;cursor:pointer;background:radial-gradient(circle at 50% 45%,rgba(139,92,246,.32),rgba(79,70,229,.12));border:1px solid var(--stroke);}
+.sos-hold .ringsvg{position:absolute;inset:0;transform:rotate(-90deg);}
+.sos-hold .txt{text-align:center;z-index:2;}
+.sos-hold .txt b{font-size:16px;display:block;}
+.sos-hold .txt small{font-size:11px;color:var(--muted);}
+.contact{display:flex;align-items:center;gap:14px;background:var(--glass);border:1px solid var(--stroke);border-radius:20px;backdrop-filter:blur(18px);padding:14px 16px;margin-bottom:10px;cursor:pointer;transition:.25s var(--spring);}
+.contact:active{transform:scale(.98);}
+.contact .cic{width:44px;height:44px;border-radius:15px;display:flex;align-items:center;justify-content:center;font-size:19px;flex:0 0 auto;background:var(--glass2);}
+.contact b{font-size:14px;display:block;}
+.contact small{color:var(--muted);font-size:11.5px;}
+.contact .go{margin-left:auto;color:var(--lilac);font-weight:700;font-size:12px;flex:0 0 auto;}
+
+/* nav */
+.nav{position:absolute;bottom:16px;left:18px;right:18px;height:68px;z-index:80;background:rgba(18,18,24,.74);backdrop-filter:blur(30px);-webkit-backdrop-filter:blur(30px);border:1px solid var(--stroke);border-radius:26px;display:flex;align-items:center;box-shadow:0 20px 50px rgba(0,0,0,.6);padding:0 6px;}
+.nav button{position:relative;flex:1;background:none;border:none;color:var(--faint);display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10px;font-weight:600;cursor:pointer;height:100%;justify-content:center;transition:color .3s;z-index:2;}
+.nav button svg{width:23px;height:23px;stroke:currentColor;fill:none;stroke-width:1.7;}
+.nav button.on{color:#fff;}
+.nav .pill{position:absolute;top:8px;bottom:8px;width:25%;border-radius:18px;background:rgba(139,92,246,.22);border:1px solid rgba(139,92,246,.3);transition:left .45s var(--spring);z-index:1;left:0;}
+.hidden-nav{display:none!important;}
+.topbar{display:flex;align-items:center;gap:14px;margin-bottom:6px;}
+.back{width:40px;height:40px;border-radius:14px;background:var(--glass);border:1px solid var(--stroke);color:var(--ink);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex:0 0 auto;}
+
+/* bottom sheet */
+.sheet-wrap{position:absolute;inset:0;z-index:300;display:none;}
+.sheet-wrap.open{display:block;}
+.backdrop{position:absolute;inset:0;background:rgba(0,0,0,.55);opacity:0;transition:opacity .35s;backdrop-filter:blur(3px);}
+.sheet-wrap.open .backdrop{opacity:1;}
+.sheet{position:absolute;left:0;right:0;bottom:0;background:#141419;border:1px solid var(--stroke);border-bottom:none;border-radius:30px 30px 0 0;padding:12px 22px calc(26px + env(safe-area-inset-bottom));max-height:78%;overflow-y:auto;transform:translateY(105%);transition:transform .45s var(--spring);box-shadow:0 -20px 60px rgba(0,0,0,.5);}
+.sheet::-webkit-scrollbar{width:0;}
+.sheet-wrap.open .sheet{transform:none;}
+.handle{width:40px;height:5px;border-radius:5px;background:rgba(255,255,255,.18);margin:2px auto 16px;}
+.sheet h3{font-size:18px;font-weight:800;letter-spacing:-.02em;margin-bottom:4px;}
+.sheet .sub{color:var(--muted);font-size:13px;line-height:1.55;margin-bottom:14px;}
+
+.toast{position:absolute;bottom:100px;left:50%;transform:translateX(-50%) translateY(16px);background:rgba(28,28,36,.94);backdrop-filter:blur(20px);border:1px solid var(--stroke);color:var(--ink);padding:12px 20px;border-radius:20px;font-size:13px;z-index:410;opacity:0;transition:.35s var(--spring);white-space:nowrap;box-shadow:var(--shadow);max-width:86%;overflow:hidden;text-overflow:ellipsis;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;}}
+@media(max-width:900px){.caption{display:none;}}
+@media(max-width:560px){
+  body{align-items:stretch;overflow:auto;}
+  .stage{padding:0;gap:0;}
+  .device{width:100vw;height:100vh;height:100dvh;border-radius:0;padding:0;box-shadow:none;}
+  .notch{display:none;}
+  .app{border-radius:0;}
+  .view{padding-top:calc(60px + env(safe-area-inset-top));}
+  .nav{bottom:calc(16px + env(safe-area-inset-bottom));}
+}
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="caption">
+    <h1>AURA</h1>
+    <p>An AI emotional wellness companion. Four spaces: <b style="color:#c7c2ff">Today</b>, your <b style="color:#c7c2ff">Journey</b>, a <b style="color:#c7c2ff">Coach</b>, and <b style="color:#c7c2ff">You</b>.</p>
+    <div class="kbd">Everything is computed from <b>your real check-ins</b>. Try: sign in, set goals, log a mood, pull down to refresh Today, open Journey for AI reflections, press-and-hold SOS in Support.</div>
+  </div>
+
+  <div class="device">
+    <div class="notch"></div>
+    <div class="app" id="app">
+      <div class="mesh" id="mesh"></div>
+      <div class="grain"></div>
+      <canvas id="particles"></canvas>
+      <canvas id="fx"></canvas>
+      <div class="statusbar"><span>9:41</span><span class="rr">📶 🔋 <span>100%</span></span></div>
+
+      <section class="view active" id="splash">
+        <div class="orb-logo"></div><div class="wordmark">AURA</div>
+        <div class="muted" style="font-size:14px">Your emotional wellness, elevated</div>
+        <div class="dots"><i></i><i></i><i></i></div>
+      </section>
+
+      <section class="view" id="welcome">
+        <div class="orb-logo" style="width:104px;height:104px"></div>
+        <div class="wordmark" style="font-size:34px;margin-top:26px">AURA</div>
+        <div class="muted" style="font-size:14.5px;line-height:1.6;max-width:250px">A private space to understand how you feel, and grow gently.</div>
+        <div class="auth-btns" id="authBtns"></div>
+        <div class="faint" style="font-size:11px;margin-top:18px;line-height:1.6;max-width:240px">Your data stays on this device. No account is required to begin.</div>
+      </section>
+
+      <section class="view" id="onboard">
+        <div class="ob-top"><button class="back" id="obBack" aria-label="Back">‹</button><div class="progressbar"><i id="obProg"></i></div></div>
+        <div class="ob-body" id="obBody"></div>
+        <div class="ob-foot"><button class="btn btn-grad press" id="obCta" onclick="obNext()">Continue</button></div>
+      </section>
+
+      <section class="view" id="today"><div id="todayBody"></div></section>
+
+      <section class="view" id="checkin">
+        <div class="topbar"><button class="back" onclick="go('today')" aria-label="Back">‹</button><div><div class="lbl">Check-in</div><div class="h2">How do you feel?</div></div></div>
+        <div class="blob-grid" style="margin-top:34px">
+          <div class="eblob b1" role="button" tabindex="0" onclick="pickMood(this,'Calm',5,'79,70,229')"><span>Calm</span></div>
+          <div class="eblob b2" style="animation-delay:.6s" role="button" tabindex="0" onclick="pickMood(this,'Happy',5,'16,185,129')"><span>Happy</span></div>
+          <div class="eblob b3" style="animation-delay:1.2s" role="button" tabindex="0" onclick="pickMood(this,'Content',4,'139,92,246')"><span>Content</span></div>
+          <div class="eblob b4" style="animation-delay:1.8s" role="button" tabindex="0" onclick="pickMood(this,'Anxious',2,'245,158,11')"><span>Anxious</span></div>
+          <div class="eblob b5" style="animation-delay:2.4s" role="button" tabindex="0" onclick="pickMood(this,'Low',2,'225,29,72')"><span>Low</span></div>
+          <div class="eblob b6" style="animation-delay:3s" role="button" tabindex="0" onclick="pickMood(this,'Numb',3,'71,85,105')"><span>Numb</span></div>
+        </div>
+        <div style="margin-top:34px"><button class="btn btn-grad press" onclick="confirmMood()">Log check-in</button></div>
+      </section>
+
+      <section class="view" id="coach">
+        <div class="coach-head"><div class="coach-av"></div><div><div style="font-weight:700;font-size:16px">AURA Coach</div><div class="muted" style="font-size:12px">Private · here without judgment</div></div></div>
+        <div class="msgs" id="msgs" aria-live="polite"></div>
+        <div class="quicks" id="quicks"></div>
+        <div class="composer"><input id="chatInput" placeholder="Share what's on your mind…" aria-label="Message" onkeydown="if(event.key==='Enter')sendMsg()"><button class="press" aria-label="Send" onclick="sendMsg()">➤</button></div>
+      </section>
+
+      <section class="view" id="breathe">
+        <div class="breath-orb" id="orb">Tap start</div>
+        <div class="breath-phase" id="breathPhase">Box breathing</div>
+        <div class="breath-count" id="breathCount">Inhale 4 · Hold 4 · Exhale 4</div>
+        <div class="breath-actions"><button class="btn btn-grad press" id="orbBtn" onclick="toggleBreath()">Start session</button><button class="btn btn-ghost" onclick="endBreathe()" style="margin-top:6px">Done</button></div>
+      </section>
+
+      <section class="view" id="gratitude">
+        <div class="topbar"><button class="back" onclick="go('today')" aria-label="Back">‹</button><div><div class="lbl">Evening ritual</div><div class="h2">Gratitude</div></div></div>
+        <div class="muted" style="font-size:13.5px;margin:6px 0 16px">Three small things. No pressure, no perfect words.</div>
+        <div class="g-card"><div class="prompt">☀️ Something that made you smile</div><textarea id="g1" placeholder="Type here…"></textarea></div>
+        <div class="g-card"><div class="prompt">🤍 Someone you're thankful for</div><textarea id="g2" placeholder="Type here…"></textarea></div>
+        <div class="g-card"><div class="prompt">⭐ Something you did well</div><textarea id="g3" placeholder="Type here…"></textarea></div>
+        <button class="btn btn-grad press" onclick="saveGratitude()">Save entry · grow your tree 🌱</button>
+        <div style="margin-top:22px" id="gList"></div>
+      </section>
+
+      <section class="view" id="journey">
+        <div class="lbl">Your patterns</div>
+        <div class="h1" style="margin-top:4px">Journey</div>
+        <div class="seg" role="tablist" id="jSeg">
+          <button class="on" onclick="setRange('day',this)">Today</button>
+          <button onclick="setRange('week',this)">Week</button>
+          <button onclick="setRange('month',this)">Month</button>
+          <button onclick="setRange('year',this)">Year</button>
+        </div>
+        <div id="jBody"></div>
+      </section>
+
+      <section class="view" id="profile"><div id="profBody"></div></section>
+
+      <section class="view" id="support">
+        <div class="topbar"><button class="back" onclick="go('today')" aria-label="Back">‹</button><div><div class="lbl" style="color:#c4b5fd">You're safe here</div><div class="h2">Support</div></div></div>
+        <div class="muted" style="font-size:14px;line-height:1.6;margin:8px 0 4px">Whatever you're feeling right now is valid. Reaching out is a strong, brave thing to do.</div>
+        <div class="sos-hold" id="sosHold" role="button" aria-label="Press and hold for help">
+          <svg class="ringsvg" width="200" height="200" viewBox="0 0 200 200"><circle cx="100" cy="100" r="93" stroke="rgba(255,255,255,.1)" stroke-width="5" fill="none"/><circle id="sosArc" cx="100" cy="100" r="93" stroke="url(#rg2)" stroke-width="5" fill="none" stroke-linecap="round" stroke-dasharray="584" stroke-dashoffset="584"/><defs><linearGradient id="rg2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4F46E5"/><stop offset="1" stop-color="#8B5CF6"/></linearGradient></defs></svg>
+          <div class="txt"><b>Hold for help</b><small>Press &amp; hold 2s</small></div>
+        </div>
+        <div id="sosContacts" style="opacity:.5;pointer-events:none;transition:.5s"></div>
+      </section>
+
+      <div class="sheet-wrap" id="sheetWrap"><div class="backdrop" onclick="closeSheet()"></div><div class="sheet" id="sheet"></div></div>
+      <div class="toast" id="toast" role="status"></div>
+
+      <nav class="nav hidden-nav" id="nav" aria-label="Main">
+        <div class="pill" id="navPill"></div>
+        <button data-v="today" class="on" onclick="go('today')"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M19.1 4.9 17 7M7 17l-2.1 2.1"/></svg>Today</button>
+        <button data-v="journey" onclick="go('journey')"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Journey</button>
+        <button data-v="coach" onclick="go('coach')"><svg viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-11.5 7.2L4 20l1-4.8A8 8 0 1 1 21 12Z"/></svg>Coach</button>
+        <button data-v="profile" onclick="go('profile')"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>You</button>
+      </nav>
+    </div>
+  </div>
+</div>
+
+<script>
+'use strict';
+/* ============ utils ============ */
+function $(id){return document.getElementById(id);}
+function hap(ms){try{if(navigator.vibrate)navigator.vibrate(ms||8);}catch(e){}}
+function dayKey(ts){var d=new Date(ts||Date.now());return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+var tt;function toast(msg){var t=$('toast');t.textContent=msg;t.classList.add('show');clearTimeout(tt);tt=setTimeout(function(){t.classList.remove('show');},2400);}
+
+/* ============ state ============ */
+var DEF={v:2,auth:null,onboarded:false,
+  profile:{name:'',goals:[],reminder:null,contacts:[
+    {icon:'👩‍⚕️',name:'School Counsellor',sub:'Ms. Reddy · replies in minutes',go:'CALL'},
+    {icon:'👤',name:'Trusted contact',sub:'The person you chose to trust',go:'CALL'},
+    {icon:'💚',name:'Tele-MANAS',sub:'Govt. of India · 14416 · 24×7 · free',go:'14416'},
+    {icon:'☎️',name:'KIRAN Helpline',sub:'National mental health · 24×7',go:'1800-599-0019'}]},
+  checkins:[],gratitude:[],breaths:[],sleep:{},energy:{},unlocked:{}};
+var store={
+  get:function(){try{return JSON.parse(localStorage.getItem('aura2')||'null');}catch(e){return window._mem||null;}},
+  set:function(s){try{localStorage.setItem('aura2',JSON.stringify(s));}catch(e){window._mem=s;}}
+};
+function migrate(){ /* pull v1 data forward if present */
+  try{var old=JSON.parse(localStorage.getItem('aura')||'null');
+    if(old&&old.checkins&&!store.get()){var s=JSON.parse(JSON.stringify(DEF));
+      s.profile.name=old.name||'';s.onboarded=!!old.onboarded;s.auth=old.onboarded?'guest':null;
+      s.checkins=(old.checkins||[]).map(function(c){return {name:c.name,score:c.score,rgb:c.rgb,ts:c.ts,day:c.day||dayKey(c.ts)};});
+      s.gratitude=old.gratitude||[];store.set(s);}
+  }catch(e){}
+}
+migrate();
+var S=store.get()||JSON.parse(JSON.stringify(DEF));
+function save(){store.set(S);}
+function firstName(){return S.profile.name?S.profile.name.split(' ')[0]:'friend';}
+
+/* ============ decorations ============ */
+(function(){var c=$('particles'),x=c.getContext('2d'),W,H,ps=[];
+  function size(){W=c.width=c.offsetWidth;H=c.height=c.offsetHeight;}
+  function init(){ps=[];for(var i=0;i<34;i++)ps.push({x:Math.random()*W,y:Math.random()*H,r:Math.random()*2.2+.4,d:Math.random()*.4+.08,o:Math.random()*.5+.12});}
+  function draw(){x.clearRect(0,0,W,H);ps.forEach(function(p){p.y-=p.d;if(p.y<-5){p.y=H+5;p.x=Math.random()*W;}x.beginPath();x.arc(p.x,p.y,p.r,0,7);x.fillStyle='rgba(190,180,255,'+p.o+')';x.fill();});requestAnimationFrame(draw);}
+  setTimeout(function(){size();init();draw();window.addEventListener('resize',function(){size();init();});},60);})();
+function confetti(){var c=$('fx'),x=c.getContext('2d');c.width=c.offsetWidth;c.height=c.offsetHeight;
+  var cols=['#8B5CF6','#4F46E5','#C4B5FD','#34D399','#FBBF24'],parts=[];
+  for(var i=0;i<70;i++)parts.push({x:c.width/2,y:c.height*0.4,vx:(Math.random()-.5)*9,vy:(Math.random()-1)*11,r:Math.random()*5+3,c:cols[i%cols.length],a:1,rot:Math.random()*6});
+  var t=0;(function run(){x.clearRect(0,0,c.width,c.height);t++;var alive=false;
+    parts.forEach(function(p){p.vy+=.28;p.x+=p.vx;p.y+=p.vy;p.a-=.012;p.rot+=.2;if(p.a>0){alive=true;x.save();x.globalAlpha=Math.max(p.a,0);x.translate(p.x,p.y);x.rotate(p.rot);x.fillStyle=p.c;x.fillRect(-p.r/2,-p.r/2,p.r,p.r*1.6);x.restore();}});
+    if(alive&&t<160)requestAnimationFrame(run);else x.clearRect(0,0,c.width,c.height);})();}
+document.addEventListener('click',function(e){var t=e.target.closest('.press');if(!t)return;hap(8);
+  var r=t.getBoundingClientRect(),s=Math.max(r.width,r.height),el=document.createElement('span');el.className='ripple';
+  el.style.width=el.style.height=s+'px';el.style.left=(e.clientX-r.left-s/2)+'px';el.style.top=(e.clientY-r.top-s/2)+'px';
+  t.appendChild(el);setTimeout(function(){el.remove();},650);});
+
+/* ============ navigation ============ */
+var TABS=['today','journey','coach','profile'];
+function go(id){
+  document.querySelectorAll('.view').forEach(function(v){v.classList.remove('active');});
+  var el=$(id);if(el)el.classList.add('active');
+  var ti=TABS.indexOf(id);
+  $('nav').classList.toggle('hidden-nav',ti<0);
+  if(ti>=0){$('navPill').style.left=(ti*25)+'%';
+    document.querySelectorAll('.nav button').forEach(function(b){b.classList.toggle('on',b.dataset.v===id);});}
+  document.querySelectorAll('.view').forEach(function(v){v.scrollTop=0;});
+  if(id==='today')renderToday();
+  if(id==='journey')renderJourney();
+  if(id==='profile')renderProfile();
+  if(id==='coach'&&!chatStarted)startChat();
+  if(id==='welcome')renderWelcome();
+}
+
+/* ============ boot ============ */
+setTimeout(function(){ if(S.onboarded&&S.auth){go('today');} else{go('welcome');} },2300);
+
+/* ============ welcome / auth ============ */
+function renderWelcome(){
+  var b=$('authBtns'),h='';
+  if(S.onboarded&&S.profile.name){
+    h+='<button class="btn btn-grad press" onclick="resume()">Continue as '+esc(firstName())+'</button>';
+    h+='<button class="btn btn-glass press" onclick="startAuth(\'google\')"><span class="gbtn"><span class="gicon">G</span>Sign in with Google</span></button>';
+  }else{
+    h+='<button class="btn btn-glass press" onclick="startAuth(\'google\')"><span class="gbtn"><span class="gicon">G</span>Continue with Google</span></button>';
+    h+='<button class="btn btn-grad press" onclick="startAuth(\'guest\')">Continue as guest</button>';
+  }
+  b.innerHTML=h;
+}
+function resume(){S.auth=S.auth||'guest';save();go('today');toast('Welcome back, '+firstName()+' 💜');}
+function startAuth(mode){
+  if(mode==='google'){
+    openSheet('<h3>Sign in</h3><div class="sub">Demo sign-in. No real Google account is used.</div>'+
+      '<button class="rowbtn press" onclick="finishAuth(\'google\')"><span class="ic">G</span><span class="nm">demo.account@gmail.com<br><small class="faint">Tap to continue</small></span><span class="arr">›</span></button>');
+  }else finishAuth('guest');
+}
+function finishAuth(mode){closeSheet();S.auth=mode;save();
+  if(S.onboarded){go('today');toast(mode==='google'?'Signed in':'Welcome back');}
+  else{obI=0;go('onboard');renderOb();}}
+
+/* ============ onboarding ============ */
+var GOALS=[{i:'😴',t:'Sleep better',s:'Wind down and rest more deeply'},{i:'🧘',t:'Less stress',s:'Handle exam pressure calmly'},{i:'🔥',t:'Build habits',s:'Small daily rituals that stick'},{i:'☀️',t:'Feel happier',s:'Notice more good in each day'}];
+var obI=0,obSel=[];
+function renderOb(){
+  $('obProg').style.width=((obI+1)/4*100)+'%';
+  $('obBack').onclick=function(){if(obI===0){go('welcome');}else{obI--;renderOb();}};
+  var b=$('obBody'),cta=$('obCta');cta.textContent='Continue';
+  if(obI===0)b.innerHTML='<div class="blob" style="margin-bottom:34px"></div><div class="h1">What should we call you?</div><div class="muted" style="font-size:14px;margin-top:8px;line-height:1.6">This stays on your device. It just makes AURA feel like yours.</div><input class="field" id="nameField" placeholder="Your first name" maxlength="18" value="'+esc(S.profile.name)+'">';
+  if(obI===1){obSel=S.profile.goals.slice();b.innerHTML='<div class="lbl">Personalise</div><div class="h1" style="margin:6px 0 4px">What matters most right now?</div><div class="muted" style="font-size:13.5px">Pick any. Your Today screen adapts to these.</div>'+GOALS.map(function(g,i){return '<div class="goal '+(obSel.indexOf(g.t)>=0?'on':'')+'" onclick="togGoal(this,'+i+')"><span class="gi">'+g.i+'</span><span><b>'+g.t+'</b><small>'+g.s+'</small></span><span class="chk">✓</span></div>';}).join('');}
+  if(obI===2)b.innerHTML='<div class="lbl">Gentle reminders</div><div class="h1" style="margin:6px 0 4px">A nudge, never a nag</div><div class="muted" style="font-size:13.5px;margin-bottom:8px">When should AURA check in with you?</div>'+['Morning ritual · 8:00','Evening wind-down · 21:00','No reminders'].map(function(t,i){return '<div class="goal '+((S.profile.reminder||2)===i?'on':'')+'" onclick="pickRem(this,'+i+')"><span class="gi">'+['🌅','🌙','🔕'][i]+'</span><span><b>'+t.split(' · ')[0]+'</b><small>'+(t.split(' · ')[1]||'You can change this later')+'</small></span><span class="chk">✓</span></div>';}).join('');
+  if(obI===3)b.innerHTML='<div class="blob" style="margin-bottom:30px"></div><div class="h1">You\'re all set, '+esc(firstName()||'friend')+'</div><div class="muted" style="font-size:14px;margin-top:10px;line-height:1.7">Everything in AURA grows from your first check-in. It takes ten seconds, and your Journey begins.</div>',cta.textContent='Begin with a check-in';
+}
+function togGoal(el,i){hap(8);el.classList.toggle('on');var t=GOALS[i].t,ix=obSel.indexOf(t);if(ix>=0)obSel.splice(ix,1);else obSel.push(t);}
+function pickRem(el,i){hap(8);el.parentNode.querySelectorAll('.goal').forEach(function(g){g.classList.remove('on');});el.classList.add('on');S.profile.reminder=i;}
+function obNext(){
+  if(obI===0){var v=$('nameField').value.trim();if(!v){toast('Add your name to continue');return;}S.profile.name=v;}
+  if(obI===1)S.profile.goals=obSel.slice();
+  if(obI===3){S.onboarded=true;save();go('checkin');return;}
+  obI++;save();renderOb();
+}
+
+/* ============ derived data ============ */
+function lastN(arr,n){return arr.slice(-n);}
+function scoreFrom(list){if(!list.length)return null;return Math.round(list.reduce(function(a,c){return a+c.score;},0)/list.length/5*100);}
+function inRange(range){var now=Date.now(),ms={day:864e5,week:7*864e5,month:30*864e5,year:365*864e5}[range];
+  return S.checkins.filter(function(c){return now-c.ts<ms;});}
+function prevRange(range){var now=Date.now(),ms={day:864e5,week:7*864e5,month:30*864e5,year:365*864e5}[range];
+  return S.checkins.filter(function(c){return now-c.ts>=ms&&now-c.ts<ms*2;});}
+function streak(){var days={};S.checkins.forEach(function(c){days[c.day]=1;});return Object.keys(days).length;}
+function breathsIn(msWin){var now=Date.now();return S.breaths.filter(function(b){return now-b<msWin;}).length;}
+function recovery(){ // 0-100 composite
+  var mood=scoreFrom(lastN(S.checkins,7));if(mood===null)return null;
+  var sk=S.sleep[dayKey()],sl=sk?sk.pct:60;
+  var br=Math.min(breathsIn(7*864e5)/5,1)*100;
+  var gr=Math.min(S.gratitude.length/5,1)*100;
+  return Math.round(mood*.45+sl*.25+br*.15+gr*.15);}
+function corr(a,b){var n=a.length;if(n<3)return null;
+  var ma=a.reduce(function(x,y){return x+y;},0)/n,mb=b.reduce(function(x,y){return x+y;},0)/n,num=0,da=0,db=0;
+  for(var i=0;i<n;i++){num+=(a[i]-ma)*(b[i]-mb);da+=Math.pow(a[i]-ma,2);db+=Math.pow(b[i]-mb,2);}
+  if(!da||!db)return null;return num/Math.sqrt(da*db);}
+function countUp(el,to){var cur=0;clearInterval(el._t);el._t=setInterval(function(){cur+=Math.ceil((to-cur)/8);if(cur>=to){cur=to;clearInterval(el._t);}el.textContent=cur;},40);}
+function ringHTML(id,size,val,label){var r=(size-10)/2,c=Math.round(2*Math.PI*r);
+  return '<div class="ring" style="width:'+size+'px;height:'+size+'px"><svg width="'+size+'" height="'+size+'"><circle cx="'+size/2+'" cy="'+size/2+'" r="'+r+'" stroke="rgba(255,255,255,.08)" stroke-width="9" fill="none"/><circle id="'+id+'" cx="'+size/2+'" cy="'+size/2+'" r="'+r+'" stroke="url(#gradr)" stroke-width="9" fill="none" stroke-linecap="round" stroke-dasharray="'+c+'" stroke-dashoffset="'+c+'"/><defs><linearGradient id="gradr" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4F46E5"/><stop offset="1" stop-color="#8B5CF6"/></linearGradient></defs></svg><div class="val"><b id="'+id+'v">0</b><small>'+label+'</small></div></div>';}
+function fireRing(id,val){var arc=$(id);if(!arc)return;var c=+arc.getAttribute('stroke-dasharray');
+  requestAnimationFrame(function(){arc.style.transition='stroke-dashoffset 1.2s var(--sp)';arc.style.strokeDashoffset=c-(val/100*c);});countUp($(id+'v'),val);}
+
+/* ============ TODAY ============ */
+function greetWord(){var h=new Date().getHours();return h<12?'Good morning':h<17?'Good afternoon':'Good evening';}
+function todayLine(){var d=new Date();return d.toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long'});}
+function recoText(){var last=S.checkins[S.checkins.length-1];
+  if(!last)return null;
+  if(S.profile.goals.indexOf('Sleep better')>=0&&new Date().getHours()>=20)return {i:'🌙',t:'Wind down for deeper sleep',s:'A 2-minute breath before bed helps you fall asleep faster.',fn:"go('breathe')"};
+  if(last.score<=2)return {i:'🫂',t:'Be gentle with yourself today',s:'Let\'s breathe together for a minute, then talk if you like.',fn:"go('breathe')"};
+  if(last.score===3)return {i:'🧘',t:'A 3-minute reset to lift the fog',s:'Your coach can help you name what\'s underneath.',fn:"go('coach')"};
+  return {i:'☀️',t:'Ride the good energy',s:'A gratitude note locks in what went right today.',fn:"go('gratitude')"};}
+function renderToday(){
+  var b=$('todayBody');var lastToday=S.checkins.filter(function(c){return c.day===dayKey();}).slice(-1)[0];
+  var h='<div class="ptr" id="ptr"><span class="spin"></span>Refreshing your day…</div>'+
+  '<div class="t-head"><div><div class="muted" style="font-size:13px">'+greetWord()+' · '+todayLine()+'</div><div class="display" style="margin-top:2px">Hello, '+esc(firstName())+'</div></div>'+
+  '<button class="t-ava press" aria-label="Profile" onclick="go(\'profile\')">'+esc((S.profile.name||'A').charAt(0).toUpperCase())+'</button></div>';
+  if(!S.checkins.length){
+    h+='<div class="card" style="margin-top:20px"><div class="empty"><div class="em">🌤️</div><h3>Begin with a check-in</h3><p>Tell AURA how you feel and everything comes to life: your score, patterns and growth tree.</p><button class="btn btn-grad press" onclick="go(\'checkin\')">Check in now · 10 seconds</button></div></div>';
+  }else{
+    var sc=scoreFrom(lastN(S.checkins,7)),rec=recovery();
+    h+='<div class="card" style="margin-top:20px"><div style="display:flex;align-items:center;gap:18px">'+ringHTML('todayRing',104,sc,'AURA SCORE')+
+      '<div><div class="lbl">Wellness</div><div style="font-size:17px;font-weight:700;margin-top:4px">'+(sc>=80?'Thriving':sc>=65?'Balanced':sc>=45?'Coping':'Needs care')+'</div>'+
+      '<div class="muted" style="font-size:12.5px;margin-top:4px;line-height:1.5">Recovery '+rec+' · '+streak()+'-day streak 🔥</div></div></div>'+
+      '<div class="metrics">'+
+      '<div class="metric"><div class="top">💜 Mood now</div>'+(lastToday?'<div class="moodline" style="gap:8px"><b>'+lastToday.name+'</b><button class="mini-chip press" onclick="go(\'checkin\')">Update</button></div>':'<button class="mini-chip press" style="margin-top:2px" onclick="go(\'checkin\')">Check in</button>')+'</div>'+
+      metricChip('🌙 Sleep','sleep',[['<6h',30],['6-8h',75],['8h+',95]])+
+      metricChip('⚡ Energy','energy',[['Low',30],['Ok',60],['High',90]])+
+      '<div class="metric"><div class="top">🌬️ Breaths</div><b>'+breathsIn(864e5)+' today</b><div class="barwrap"><div class="fill" data-w="'+Math.min(breathsIn(864e5)*50,100)+'%"></div></div></div>'+
+      '</div></div>';
+    var r=recoText();
+    if(r)h+='<div class="card tap press" onclick="'+r.fn+'" style="margin-top:14px"><div class="lbl">For you right now</div><div class="moodline" style="margin-top:10px"><div class="dot" style="background:var(--grad);box-shadow:0 12px 28px rgba(79,70,229,.45)">'+r.i+'</div><div><div style="font-weight:600;font-size:15px">'+r.t+'</div><div class="muted" style="font-size:12.5px;margin-top:2px">'+r.s+'</div></div></div></div>';
+  }
+  h+='<div class="rituals">'+
+    '<div class="card tap press" onclick="go(\'breathe\')" style="padding:16px"><div style="font-size:23px">🌬️</div><div style="font-weight:600;margin-top:8px">Breathe</div><div class="muted" style="font-size:12px">2-min calm</div></div>'+
+    '<div class="card tap press" onclick="go(\'gratitude\')" style="padding:16px"><div style="font-size:23px">📖</div><div style="font-weight:600;margin-top:8px">Gratitude</div><div class="muted" style="font-size:12px">3 good things</div></div></div>'+
+  '<div class="card tap press" onclick="go(\'support\')" style="margin-top:14px;padding:15px 18px"><div class="moodline"><div class="dot" style="background:var(--glass2)">💚</div><div><div style="font-weight:600;font-size:14px">Need someone right now?</div><div class="muted" style="font-size:12px">Counsellor, trusted adult and 24×7 helplines</div></div><span style="margin-left:auto;color:var(--faint)">›</span></div></div>';
+  b.innerHTML=h;
+  if(S.checkins.length){fireRing('todayRing',scoreFrom(lastN(S.checkins,7)));
+    b.querySelectorAll('.fill').forEach(function(f){f.style.width='0';requestAnimationFrame(function(){f.style.width=f.dataset.w;});});}
+  bindPTR();
+}
+function metricChip(label,key,opts){var v=S[key][dayKey()];
+  if(v)return '<div class="metric"><div class="top">'+label+'</div><b>'+v.label+'</b><div class="barwrap"><div class="fill" data-w="'+v.pct+'%"></div></div></div>';
+  return '<div class="metric"><div class="top">'+label+'</div><div style="margin-top:2px">'+opts.map(function(o){return '<button class="mini-chip press" onclick="logDaily(\''+key+'\',\''+o[0]+'\','+o[1]+')">'+o[0]+'</button>';}).join('')+'</div></div>';}
+function logDaily(key,label,pct){S[key][dayKey()]={label:label,pct:pct};save();renderToday();toast('Logged 💜');checkAch();}
+/* pull to refresh */
+function bindPTR(){var v=$('today'),ptr=$('ptr'),startY=0,pull=0,on=false;
+  v.ontouchstart=function(e){if(v.scrollTop<=0){startY=e.touches[0].clientY;on=true;}};
+  v.ontouchmove=function(e){if(!on)return;pull=e.touches[0].clientY-startY;if(pull>0)ptr.style.height=Math.min(pull*.4,54)+'px';};
+  v.ontouchend=function(){if(!on)return;on=false;
+    if(pull*.4>=50){hap(12);setTimeout(function(){ptr.style.height='0';renderToday();toast('Up to date ✨');},700);}
+    else ptr.style.height='0';pull=0;};}
+
+/* ============ CHECK-IN ============ */
+var chosen=null;
+function pickMood(el,name,score,rgb){hap(10);
+  document.querySelectorAll('.eblob').forEach(function(b){b.classList.remove('sel');});
+  el.classList.add('sel');chosen={name:name,score:score,rgb:rgb};
+  $('mesh').style.background='radial-gradient(closest-side at 20% 15%,rgba('+rgb+',.6),transparent),radial-gradient(closest-side at 85% 22%,rgba('+rgb+',.4),transparent),radial-gradient(closest-side at 30% 80%,rgba('+rgb+',.35),transparent),radial-gradient(closest-side at 78% 92%,rgba('+rgb+',.3),transparent)';}
+function confirmMood(){
+  if(!chosen){toast('Pick how you feel first');return;}
+  S.checkins.push({name:chosen.name,score:chosen.score,rgb:chosen.rgb,ts:Date.now(),day:dayKey()});save();
+  var low=chosen.score<=2;chosen=null;
+  document.querySelectorAll('.eblob').forEach(function(b){b.classList.remove('sel');});
+  go('today');setTimeout(confetti,350);checkAch();
+  if(low)setTimeout(function(){toast('That sounds heavy. Your coach is one tap away 💜');},1400);}
+
+/* ============ COACH ============ */
+var chatStarted=false;
+function elm(cls,html){var d=document.createElement('div');d.className=cls;if(html)d.innerHTML=html;return d;}
+function botSay(html){var m=$('msgs'),t=elm('typing','<i></i><i></i><i></i>');m.appendChild(t);m.scrollTop=m.scrollHeight;
+  setTimeout(function(){t.remove();m.appendChild(elm('bubble b-bot',html));m.scrollTop=m.scrollHeight;},750);}
+function meSay(txt){var m=$('msgs'),b=elm('bubble b-me');b.textContent=txt;m.appendChild(b);m.scrollTop=m.scrollHeight;}
+function setQuicks(arr){var q=$('quicks');q.innerHTML='';arr.forEach(function(t){var c=elm('chip');c.textContent=t;c.onclick=function(){handle(t);};q.appendChild(c);});}
+function addChip(label,fn){var c=elm('chip');c.innerHTML=label;c.onclick=fn;$('quicks').appendChild(c);}
+function startChat(){chatStarted=true;
+  var last=S.checkins[S.checkins.length-1];
+  if(last&&last.day===dayKey()&&last.score<=2){botSay("Hi "+esc(firstName())+" 💜 I saw you checked in feeling <b>"+last.name+"</b> today. I'm here, no judgment. Want to tell me what's behind it?");setQuicks(["It's exam stress","Something happened","I don't know why","I'd rather do something calming"]);}
+  else if(last&&last.day===dayKey()){botSay("Hi "+esc(firstName())+" 💜 You checked in feeling <b>"+last.name+"</b> today, I'm glad. What's present for you right now?");setQuicks(["I'm stressed about exams","I can't switch off my mind","Just want to talk","I'm okay, just checking in"]);}
+  else{botSay("Hi "+esc(firstName())+" 💜 I'm your AURA coach. This space is just for you, private and judgment-free. What's on your mind?");setQuicks(["I'm stressed about exams","I feel low","I can't sleep","I'm okay, just checking in"]);}}
+function sendMsg(){var i=$('chatInput'),v=i.value.trim();if(!v)return;i.value='';handle(v);}
+function handle(text){meSay(text);$('quicks').innerHTML='';var t=text.toLowerCase();
+  if(/(kill myself|end my life|suicide|don'?t want to live|hurt myself|self harm|want to die|no reason to live)/.test(t)){
+    botSay("I'm really glad you told me. I'm so sorry you're carrying this much pain, and you don't have to carry it alone. You matter. 💜");
+    setTimeout(function(){botSay("Please reach out to someone right now. Tap <b>Support</b>, or call <b>Tele-MANAS 14416</b> (free, 24×7). Is there a trusted adult near you?");$('quicks').innerHTML='';addChip('💚 Open Support',function(){go('support');});},1500);return;}
+  if(/exam|test|study|marks|result|board|score/.test(t)){botSay("Exam pressure is so common, and it says nothing about your worth. Let's shrink it. What weighs most: how much there is to do, fear of the result, or comparing yourself to others?");setQuicks(["Too much to do","Scared of results","Everyone seems ahead","Give me a calming exercise"]);}
+  else if(/too much|amount|syllabus|time|behind/.test(t)){botSay("Let's make it tiny. One chapter, 25 focused minutes, then a real 5-minute break. Momentum beats motivation. Want a breathing reset first?");addChip('🌬️ Breathing reset',function(){go('breathe');});addChip('That helps, thanks',function(){handle('thanks that helps');});}
+  else if(/low|sad|down|depress|lonely|alone|cry|empty|numb|something happened|don'?t know why/.test(t)){botSay("Thank you for trusting me with that. Low days are real and they pass. Would it help to name what's underneath, or to do one small kind thing for yourself right now?");setQuicks(["Something's bothering me","Suggest a small thing","I'd like to talk to someone"]);}
+  else if(/sleep|tired|awake|insomnia|switch off|overthink|racing/.test(t)){botSay("A racing mind at night is exhausting. Let's slow it down: the breathing orb, in 4, hold 4, out 4, or a gratitude note to close the day gently.");addChip('🌬️ Breathe to unwind',function(){go('breathe');});addChip('📖 Gratitude',function(){go('gratitude');});}
+  else if(/breath|calm|relax|reset|anxious|panic|nervous|calming/.test(t)){botSay("Great instinct. Let's regulate together, follow the orb for a minute. I'll be right here after. 🌬️");addChip('Open breathing →',function(){go('breathe');});}
+  else if(/talk to someone|trusted|counsel|parent|help/.test(t)){botSay("That's a really healthy step. A parent, teacher or counsellor can lighten this a lot. I can help you reach one now.");addChip('💚 Open Support',function(){go('support');});}
+  else if(/thank|helps|better|okay|good|fine|great/.test(t)){botSay("I'm really glad 💜 Noticing and naming your feelings is a real strength. Want to lock in the good with a gratitude note?");addChip('📖 Open gratitude',function(){go('gratitude');});}
+  else{botSay("Thank you for sharing that. Tell me a little more, when did this start, and what does it feel like in your body? There's no wrong answer here.");setQuicks(["It started recently","It's been building","I'm not sure"]);}}
+
+/* ============ BREATHE ============ */
+var breathing=false,bTimer,phase=0,seq=[{t:'Breathe in',s:1.28},{t:'Hold',s:1.28},{t:'Breathe out',s:.72},{t:'Hold',s:.72}];
+function toggleBreath(){var orb=$('orb'),btn=$('orbBtn');breathing=!breathing;
+  if(breathing){btn.textContent='End session';phase=0;stepB();bTimer=setInterval(stepB,4000);}
+  else{clearInterval(bTimer);orb.style.transform='';orb.style.boxShadow='';orb.textContent='Tap start';$('breathPhase').textContent='Box breathing';$('breathCount').textContent='Inhale 4 · Hold 4 · Exhale 4';btn.textContent='Start session';
+    S.breaths.push(Date.now());save();checkAch();toast('Session logged 🌬️');}}
+function endBreathe(){if(breathing)toggleBreath();go('today');}
+function stepB(){var orb=$('orb'),p=seq[phase%4];orb.style.transform='scale('+p.s+')';
+  orb.style.boxShadow=p.s>1?'0 0 120px rgba(139,92,246,.85),inset 0 0 60px rgba(255,255,255,.3)':'0 0 50px rgba(139,92,246,.45),inset 0 0 40px rgba(255,255,255,.15)';
+  orb.textContent=p.t;$('breathPhase').textContent=p.t;hap(6);
+  var n=4;$('breathCount').textContent='';var cd=setInterval(function(){$('breathCount').textContent=n;n--;if(n<0)clearInterval(cd);},1000);phase++;}
+
+/* ============ GRATITUDE ============ */
+function renderGratitude(){var l=$('gList');
+  if(!S.gratitude.length){l.innerHTML='<div class="empty" style="padding:18px 6px"><div class="em">📖</div><h3>Your journal is waiting</h3><p>Save your first entry above. Each one grows your tree.</p></div>';return;}
+  l.innerHTML='<div class="lbl" style="margin-bottom:12px">Recent</div>'+S.gratitude.slice(0,6).map(function(e){return '<div class="g-entry"><div class="dt">'+esc(e.dt)+'</div>'+e.items.map(function(v){return '<p>· '+esc(v)+'</p>';}).join('')+'</div>';}).join('');}
+function saveGratitude(){var vals=['g1','g2','g3'].map(function(id){return $(id).value.trim();}).filter(Boolean);
+  if(!vals.length){toast('Add at least one 🌱');return;}
+  S.gratitude.unshift({items:vals,dt:new Date().toLocaleDateString('en-IN',{day:'numeric',month:'short'}),ts:Date.now()});save();
+  ['g1','g2','g3'].forEach(function(id){$(id).value='';});renderGratitude();confetti();toast('Saved 🌸 Your tree grew a little');checkAch();}
+
+/* ============ JOURNEY ============ */
+var jRange='day';
+function setRange(r,btn){jRange=r;hap(8);document.querySelectorAll('#jSeg button').forEach(function(b){b.classList.remove('on');});btn.classList.add('on');renderJourney();}
+function seriesFor(range){ // returns {vals,labels}
+  var now=new Date();
+  if(range==='day'){var t=S.checkins.filter(function(c){return c.day===dayKey();});return {vals:t.map(function(c){return c.score;}),labels:t.map(function(c){return new Date(c.ts).toLocaleTimeString('en-IN',{hour:'numeric',minute:'2-digit'});})};}
+  if(range==='week'){var out=[],lab=[];for(var i=6;i>=0;i--){var d=new Date(now-i*864e5),k=dayKey(d);var day=S.checkins.filter(function(c){return c.day===k;});out.push(day.length?day.reduce(function(a,c){return a+c.score;},0)/day.length:0);lab.push(['S','M','T','W','T','F','S'][d.getDay()]);}return {vals:out,labels:lab};}
+  if(range==='month'){var out2=[],lab2=[];for(var w=3;w>=0;w--){var lo=now-((w+1)*7*864e5),hi=now-(w*7*864e5);var seg=S.checkins.filter(function(c){return c.ts>=lo&&c.ts<hi;});out2.push(seg.length?seg.reduce(function(a,c){return a+c.score;},0)/seg.length:0);lab2.push('W'+(4-w));}return {vals:out2,labels:lab2};}
+  var out3=[],lab3=[];for(var m=11;m>=0;m--){var d2=new Date(now.getFullYear(),now.getMonth()-m,1),d3=new Date(now.getFullYear(),now.getMonth()-m+1,1);
+    var seg2=S.checkins.filter(function(c){return c.ts>=d2.getTime()&&c.ts<d3.getTime();});
+    out3.push(seg2.length?seg2.reduce(function(a,c){return a+c.score;},0)/seg2.length:0);lab3.push(d2.toLocaleDateString('en-IN',{month:'narrow'}));}
+  return {vals:out3,labels:lab3};}
+function reflection(range){var list=inRange(range);if(!list.length)return null;
+  var sc=scoreFrom(list),prev=scoreFrom(prevRange(range));
+  var best=list.slice().sort(function(a,b){return b.score-a.score;})[0];
+  var s='<span class="hl">'+esc(firstName())+'</span>, your average this '+(range==='day'?'day':range)+' reads <span class="hl">'+(sc>=80?'thriving':sc>=65?'balanced':sc>=45?'coping':'heavy')+'</span> ('+sc+').';
+  if(prev!==null)s+=' That\'s '+(sc>=prev?'up':'down')+' from '+prev+' last period.';
+  if(best)s+=' Your brightest moment was feeling <span class="hl">'+best.name+'</span>.';
+  if(breathsIn(7*864e5)>0)s+=' Breathing sessions appear on your calmer days, keep that ritual.';
+  else s+=' You haven\'t breathed with the orb lately, two minutes can shift an afternoon.';
+  if(S.gratitude.length)s+=' Gratitude entries: '+S.gratitude.length+'. They compound quietly.';
+  return s;}
+function corrCards(){
+  var days=[];for(var i=13;i>=0;i--){var k=dayKey(new Date(Date.now()-i*864e5));var cs=S.checkins.filter(function(c){return c.day===k;});
+    days.push({mood:cs.length?cs.reduce(function(a,c){return a+c.score;},0)/cs.length:null,sleep:S.sleep[k]?S.sleep[k].pct:null,
+      breaths:S.breaths.filter(function(b){return dayKey(b)===k;}).length,grat:S.gratitude.filter(function(g){return dayKey(g.ts)===k;}).length});}
+  function pair(fa,fb){var a=[],b=[];days.forEach(function(d){var x=fa(d),y=fb(d);if(x!==null&&y!==null){a.push(x);b.push(y);}});return corr(a,b);}
+  var c1=pair(function(d){return d.sleep;},function(d){return d.mood;});
+  var c2=pair(function(d){return d.breaths;},function(d){return d.mood===null?null:5-d.mood;});
+  var c3=pair(function(d){return d.grat;},function(d){return d.mood;});
+  function row(icon,title,c,posGood){
+    if(c===null)return '<div class="corr"><div class="ci">'+icon+'</div><div><b>'+title+'</b><small>Unlocks with a few more days of data</small></div><span class="badge bd-lock">LOCKED</span></div>';
+    var mag=Math.abs(c),word=mag>.5?'strong':mag>.25?'moderate':'weak';
+    var dir=(c>=0)===posGood?'helping you':'worth watching';
+    return '<div class="corr"><div class="ci">'+icon+'</div><div><b>'+title+'</b><small>'+word.charAt(0).toUpperCase()+word.slice(1)+' link in your data · '+dir+'</small></div><span class="badge '+(mag>.5?'bd-strong':'bd-mod')+'">'+word.toUpperCase()+'</span></div>';}
+  return row('🌙','Sleep vs Mood',c1,true)+row('🌬️','Breathing vs Stress',c2,false)+row('📖','Gratitude vs Mood',c3,true);}
+function renderJourney(){
+  var b=$('jBody');
+  if(S.checkins.length<1){b.innerHTML='<div class="card"><div class="empty"><div class="em">📊</div><h3>Your Journey starts with data</h3><p>Check in once and this becomes a living picture of your mind: trends, correlations and AI reflections.</p><button class="btn btn-grad press" onclick="go(\'checkin\')">First check-in</button></div></div>';return;}
+  b.innerHTML='<div class="card"><div class="skel" style="height:120px"></div></div>';
+  setTimeout(function(){
+    var list=inRange(jRange),sc=scoreFrom(list),prev=scoreFrom(prevRange(jRange)),rec=recovery();
+    var h='';
+    h+='<div class="card"><div style="display:flex;align-items:center;gap:18px">'+ringHTML('jRing',100,sc||0,'AI SCORE')+
+      '<div><div class="lbl">AI wellness score</div><div style="display:flex;align-items:center;gap:8px;margin-top:6px"><span style="font-size:17px;font-weight:700">'+(sc===null?'No data yet':(sc>=80?'Thriving':sc>=65?'Balanced':sc>=45?'Coping':'Needs care'))+'</span>'+
+      (prev!==null&&sc!==null?'<span class="delta '+(sc>=prev?'d-up':'d-dn')+'">'+(sc>=prev?'▲':'▼')+' '+Math.abs(sc-prev)+'</span>':'')+'</div>'+
+      '<div class="muted" style="font-size:12px;margin-top:4px">'+list.length+' check-in'+(list.length===1?'':'s')+' this '+(jRange==='day'?'day':jRange)+'</div></div></div></div>';
+    var refl=reflection(jRange);
+    if(refl)h+='<div class="card" style="margin-top:14px"><div class="lbl" style="margin-bottom:10px">✨ AI reflection</div><div class="reflect">'+refl+'</div></div>';
+    var ser=seriesFor(jRange);
+    if(jRange==='day'&&list.length){
+      h+='<div class="card" style="margin-top:14px"><b>Today\'s timeline</b><div style="margin-top:8px">'+list.map(function(c){
+        return '<div class="tl-item"><div class="tdot">'+({5:'😊',4:'🙂',3:'😐',2:'😔',1:'😰'}[c.score]||'💜')+'</div><div><b>'+c.name+'</b><small>'+new Date(c.ts).toLocaleTimeString('en-IN',{hour:'numeric',minute:'2-digit'})+'</small></div></div>';}).join('')+'</div></div>';
+    }else{
+      h+='<div class="card" style="margin-top:14px"><div style="display:flex;justify-content:space-between;align-items:center"><b>Mood trend</b><span class="muted" style="font-size:12px">'+({week:'last 7 days',month:'last 4 weeks',year:'last 12 months'}[jRange]||'')+'</span></div><div class="chart" id="jChart"></div></div>';}
+    h+='<div class="card" style="margin-top:14px"><b>Correlations</b><div class="muted" style="font-size:12px;margin:3px 0 6px">Computed from your last 14 days</div>'+corrCards()+'</div>';
+    if(rec!==null){h+='<div class="card" style="margin-top:14px"><div style="display:flex;justify-content:space-between;align-items:center"><b>Recovery</b><span style="font-size:22px;font-weight:800">'+rec+'</span></div>'+
+      [['Mind · mood',scoreFrom(lastN(S.checkins,7))||0],['Rest · sleep',(S.sleep[dayKey()]||{pct:0}).pct],['Breath · sessions',Math.min(breathsIn(7*864e5)*20,100)],['Heart · gratitude',Math.min(S.gratitude.length*20,100)]].map(function(x){
+        return '<div class="metric" style="margin-top:12px"><div class="top" style="justify-content:space-between"><span>'+x[0]+'</span><span>'+Math.round(x[1])+'</span></div><div class="barwrap"><div class="fill" data-w="'+x[1]+'%"></div></div></div>';}).join('')+'</div>';}
+    h+='<div class="card" style="margin-top:14px"><div style="display:flex;justify-content:space-between;align-items:center"><b>Streak</b><span class="muted" style="font-size:12px">days with a check-in</span></div><div style="display:flex;align-items:center;gap:8px;margin-top:10px"><span style="font-size:22px">🔥</span><span style="font-size:30px;font-weight:800">'+streak()+'</span><span class="muted">day'+(streak()===1?'':'s')+'</span></div></div>';
+    b.innerHTML=h;
+    if(sc!==null)fireRing('jRing',sc);
+    var c=$('jChart');if(c){ser.vals.forEach(function(v,i){var bar=elm('bar');bar.style.height='5px';bar.innerHTML='<small>'+ser.labels[i]+'</small>';
+      if(v>0&&v<=2.5)bar.style.background='linear-gradient(#FB7185,#E11D48)';else if(v>0&&v<3.5)bar.style.background='linear-gradient(#FBBF24,#F59E0B)';
+      c.appendChild(bar);setTimeout(function(){bar.style.height=(v>0?(v/5*100):3)+'%';},60+i*55);});}
+    b.querySelectorAll('.fill').forEach(function(f){f.style.width='0';requestAnimationFrame(function(){f.style.width=f.dataset.w;});});
+  },480);}
+
+/* ============ PROFILE ============ */
+function treeStage(n){return n>=21?'🌸':n>=14?'🌳':n>=7?'🪴':n>=3?'🌿':n>=1?'🌱':'🌰';}
+var ACH=[{k:'c1',e:'🌱',n:'First check-in',f:function(){return S.checkins.length>=1;}},
+  {k:'s3',e:'🔥',n:'3-day streak',f:function(){return streak()>=3;}},
+  {k:'b1',e:'🌬️',n:'First breath',f:function(){return S.breaths.length>=1;}},
+  {k:'g1',e:'📖',n:'Grateful heart',f:function(){return S.gratitude.length>=1;}},
+  {k:'c14',e:'🌳',n:'Tree grown',f:function(){return S.checkins.length>=14;}},
+  {k:'c21',e:'💎',n:'21-day zen',f:function(){return S.checkins.length>=21;}}];
+function checkAch(){ACH.forEach(function(a){if(!S.unlocked[a.k]&&a.f()){S.unlocked[a.k]=1;save();setTimeout(function(){confetti();toast(a.e+' Achievement unlocked: '+a.n);},600);}});}
+function renderProfile(){
+  var n=S.checkins.length,b=$('profBody');
+  var lvl=n>=21?'Level 5 · Zen':n>=14?'Level 4 · Mindful':n>=7?'Level 3 · Steady':n>=3?'Level 2 · Growing':'Level 1 · New Explorer';
+  b.innerHTML=
+  '<div class="p-head"><div class="avatar"><span>'+esc((S.profile.name||'A').charAt(0).toUpperCase())+'</span></div>'+
+  '<div><div style="font-size:20px;font-weight:800">'+esc(S.profile.name||'You')+'</div><div class="muted" style="font-size:12.5px;margin-top:2px">'+lvl+'</div>'+
+  '<div class="muted" style="font-size:11.5px;margin-top:3px">'+(S.auth==='google'?'🟢 Google account (demo)':'👤 Guest · data on this device')+'</div></div></div>'+
+  '<div class="card tree-card" style="margin-top:18px"><div class="lbl">Growth tree</div><div class="tree">'+treeStage(n)+'</div>'+
+  '<div class="muted" style="font-size:13px;margin-top:8px"><b style="color:var(--ink)">'+n+'</b> check-ins nurtured</div>'+
+  '<div class="barwrap" style="margin-top:14px"><div class="fill" id="treeFill"></div></div>'+
+  '<div class="faint" style="font-size:11px;margin-top:8px">'+(n===0?'Check in to plant your seed 🌱':n>=21?'Fully bloomed, beautiful work 🌸':(21-n)+' more to full bloom 🌸')+'</div></div>'+
+  '<div class="lbl" style="margin:20px 0 12px">Achievements</div><div class="ach-grid">'+ACH.map(function(a){return '<div class="ach '+(S.unlocked[a.k]?'':'locked')+'"><span class="em">'+a.e+'</span><small>'+a.n+'</small></div>';}).join('')+'</div>'+
+  '<div class="lbl" style="margin:20px 0 10px">Account</div><div class="card" style="padding:4px 18px">'+
+  prow('👤','Personal info','sheetPersonal()')+prow('🎯','Goals','sheetGoals()')+prow('🔔','Notifications','sheetNotif()')+
+  prow('🔒','Privacy','sheetPrivacy()')+prow('💚','Emergency contacts','sheetContacts()')+prow('📦','Export my data','sheetExport()')+prow('ℹ️','About AURA','sheetAbout()')+'</div>'+
+  '<div class="lbl" style="margin:20px 0 10px">Session</div><div class="card" style="padding:4px 18px">'+
+  prow('🚪','Log out','doLogout()')+prow('🔁','Switch account','sheetSwitch()')+prow('🧹','Reset local data','sheetReset()')+'</div>'+
+  '<button class="btn btn-danger press" style="margin-top:14px" onclick="sheetDelete()">Delete account</button>'+
+  '<div class="muted" style="font-size:11.5px;text-align:center;margin:16px 0 4px;line-height:1.6">AURA is a companion, not a replacement for professional care.<br>Your journals and chats never leave this device.</div>';
+  setTimeout(function(){$('treeFill').style.width=Math.min(n/21*100,100)+'%';},80);}
+function prow(ic,nm,fn){return '<button class="rowbtn press" onclick="'+fn+'"><span class="ic">'+ic+'</span><span class="nm">'+nm+'</span><span class="arr">›</span></button>';}
+
+/* ============ sheets ============ */
+function openSheet(html){$('sheet').innerHTML='<div class="handle"></div>'+html;$('sheetWrap').classList.add('open');hap(8);}
+function closeSheet(){$('sheetWrap').classList.remove('open');}
+function sheetPersonal(){openSheet('<h3>Personal info</h3><div class="sub">Stored only on this device.</div><input class="field" id="editName" value="'+esc(S.profile.name)+'" maxlength="18" style="margin-top:0"><button class="btn btn-grad press" style="margin-top:14px" onclick="S.profile.name=$(\'editName\').value.trim()||S.profile.name;save();closeSheet();renderProfile();toast(\'Saved\')">Save</button>');}
+function sheetGoals(){openSheet('<h3>Your goals</h3><div class="sub">Today adapts to what you pick.</div>'+GOALS.map(function(g,i){var on=S.profile.goals.indexOf(g.t)>=0;return '<div class="goal '+(on?'on':'')+'" onclick="sgTog(this,'+i+')"><span class="gi">'+g.i+'</span><span><b>'+g.t+'</b><small>'+g.s+'</small></span><span class="chk">✓</span></div>';}).join('')+'<button class="btn btn-grad press" style="margin-top:14px" onclick="closeSheet();renderToday_safe();toast(\'Goals updated\')">Done</button>');}
+function sgTog(el,i){hap(8);el.classList.toggle('on');var t=GOALS[i].t,ix=S.profile.goals.indexOf(t);if(ix>=0)S.profile.goals.splice(ix,1);else S.profile.goals.push(t);save();}
+function renderToday_safe(){if($('today').classList.contains('active'))renderToday();}
+function sheetNotif(){openSheet('<h3>Notifications</h3><div class="sub">Gentle nudges, never a nag. (Demo, no real notifications are sent.)</div>'+['Morning ritual · 8:00','Evening wind-down · 21:00','No reminders'].map(function(t,i){return '<div class="goal '+((S.profile.reminder||2)===i?'on':'')+'" onclick="pickRem(this,'+i+');save()"><span class="gi">'+['🌅','🌙','🔕'][i]+'</span><span><b>'+t.split(' · ')[0]+'</b><small>'+(t.split(' · ')[1]||'')+'</small></span><span class="chk">✓</span></div>';}).join(''));}
+function sheetPrivacy(){openSheet('<h3>Privacy</h3><div class="sub">How AURA treats your data.</div><div class="reflect" style="font-size:13.5px;color:var(--muted);line-height:1.7">· Everything you write stays <span class="hl">on this device</span>. There is no server.<br>· Nothing is shared with your school, parents or anyone else.<br>· The coach never judges, and crisis language always surfaces real human help.<br>· You can export or erase everything at any time from this screen.</div>');}
+function sheetContacts(){openSheet('<h3>Emergency contacts</h3><div class="sub">Who appears on your Support screen.</div>'+S.profile.contacts.map(function(c,i){return '<div class="contact" style="cursor:default"><div class="cic">'+c.icon+'</div><div style="flex:1"><b>'+esc(c.name)+'</b><small>'+esc(c.sub)+'</small></div></div>';}).join('')+'<div class="muted" style="font-size:12px;line-height:1.6">Helplines are fixed for your safety. Personal contacts become editable with accounts in the full release.</div>');}
+function sheetExport(){var data=JSON.stringify(S,null,2);
+  openSheet('<h3>Export my data</h3><div class="sub">Your complete AURA record as JSON.</div><textarea class="field" style="height:150px;font-size:11px;margin-top:0" readonly>'+esc(data)+'</textarea><a class="btn btn-grad press" style="display:block;text-align:center;text-decoration:none;margin-top:12px" download="aura-data.json" href="data:application/json;charset=utf-8,'+encodeURIComponent(data)+'">Download JSON</a>');}
+function sheetAbout(){openSheet('<h3>About AURA</h3><div class="sub">Version 2.0 · Prototype</div><div class="reflect" style="font-size:13.5px;color:var(--muted);line-height:1.7">AURA is a student-built emotional wellness companion for LaunchVerse 2026. It exists because asking for help should feel as easy as opening an app.<br><br>Built with care · Made in India 🇮🇳</div>');}
+function doLogout(){S.auth=null;save();closeSheet();chatStarted=false;go('welcome');toast('Logged out. Your data is safe here.');}
+function sheetSwitch(){openSheet('<h3>Switch account</h3><div class="sub">Your current data will be archived on this device and a fresh AURA begins.</div><button class="btn btn-grad press" onclick="doSwitch()">Archive &amp; switch</button><button class="btn btn-ghost" onclick="closeSheet()" style="margin-top:6px">Cancel</button>');}
+function doSwitch(){try{localStorage.setItem('aura_archive_'+Date.now(),JSON.stringify(S));}catch(e){}
+  S=JSON.parse(JSON.stringify(DEF));save();closeSheet();chatStarted=false;obI=0;go('welcome');toast('Fresh start ready');}
+function sheetReset(){openSheet('<h3>Reset local data</h3><div class="sub">Clears check-ins, journal and sessions. Keeps your name, goals and sign-in.</div><button class="btn btn-danger press" onclick="doReset()">Reset my data</button><button class="btn btn-ghost" onclick="closeSheet()" style="margin-top:6px">Cancel</button>');}
+function doReset(){S.checkins=[];S.gratitude=[];S.breaths=[];S.sleep={};S.energy={};S.unlocked={};save();closeSheet();renderProfile();toast('Data cleared 🧹');}
+function sheetDelete(){openSheet('<h3>Delete account</h3><div class="sub">This permanently erases everything, profile, check-ins, journal. There is no undo.</div><button class="btn btn-danger press" onclick="doDelete()">Delete everything</button><button class="btn btn-ghost" onclick="closeSheet()" style="margin-top:6px">Keep my account</button>');}
+function doDelete(){try{localStorage.removeItem('aura2');localStorage.removeItem('aura');}catch(e){}window._mem=null;location.reload();}
+
+/* ============ SUPPORT ============ */
+function renderSOS(){$('sosContacts').innerHTML='<div class="lbl" style="margin:16px 0 12px">Reach someone now</div>'+
+  S.profile.contacts.map(function(c){return '<div class="contact press" onclick="toast(\'Connecting: '+esc(c.name)+'…\')"><div class="cic">'+c.icon+'</div><div><b>'+esc(c.name)+'</b><small>'+esc(c.sub)+'</small></div><span class="go">'+esc(c.go)+'</span></div>';}).join('')+
+  '<div class="lbl" style="margin:20px 0 12px">While you wait · grounding</div><div class="card" style="padding:16px 18px"><div style="font-weight:600;margin-bottom:6px">5-4-3-2-1 senses</div><ol style="padding-left:18px;color:var(--muted);font-size:13.5px;line-height:1.9"><li>5 things you can see</li><li>4 things you can touch</li><li>3 things you can hear</li><li>2 things you can smell</li><li>1 slow, deep breath</li></ol></div>'+
+  '<div class="muted" style="font-size:12px;text-align:center;margin-top:16px">In immediate danger? Call <b style="color:var(--ink)">112</b>.</div>';}
+renderSOS();
+(function(){var hold=$('sosHold'),arc=$('sosArc'),circ=584,done=false,raf,start;
+  function begin(){if(done)return;start=Date.now();hap(10);loop();}
+  function loop(){var p=Math.min((Date.now()-start)/2000,1);arc.style.strokeDashoffset=circ-(p*circ);if(p>=1){finish();return;}raf=requestAnimationFrame(loop);}
+  function cancel(){if(done)return;cancelAnimationFrame(raf);arc.style.transition='stroke-dashoffset .4s';arc.style.strokeDashoffset=circ;setTimeout(function(){arc.style.transition='';},400);}
+  function finish(){done=true;hap(30);var c=$('sosContacts');c.style.opacity='1';c.style.pointerEvents='auto';
+    hold.querySelector('.txt').innerHTML='<b>Help unlocked</b><small>Choose who to reach</small>';toast('You did the brave part 💜');}
+  hold.addEventListener('mousedown',begin);hold.addEventListener('touchstart',function(e){e.preventDefault();begin();},{passive:false});
+  ['mouseup','mouseleave','touchend'].forEach(function(ev){hold.addEventListener(ev,cancel);});})();
+
+/* gratitude list on open */
+var _go=go;go=function(id){_go(id);if(id==='gratitude')renderGratitude();};
+</script>
+</body>
+</html>
