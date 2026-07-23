@@ -370,7 +370,7 @@ button{font:inherit;color:inherit;}
 
       <section class="view" id="journey">
         <div class="lbl">Your patterns</div>
-        <div class="h1" style="margin-top:4px">Journey</div>
+        <div class="h1" style="margin-top:4px">Journey <span id="jDay" class="badge bd-strong" style="vertical-align:middle"></span></div>
         <div class="seg" role="tablist" id="jSeg">
           <button class="on" onclick="setRange('day',this)">Today</button>
           <button onclick="setRange('week',this)">Week</button>
@@ -416,7 +416,7 @@ function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp
 var tt;function toast(msg){var t=$('toast');t.textContent=msg;t.classList.add('show');clearTimeout(tt);tt=setTimeout(function(){t.classList.remove('show');},2400);}
 
 /* ============ state ============ */
-var DEF={v:2,auth:null,onboarded:false,
+var DEF={v:2,auth:null,onboarded:false,start:null,
   profile:{name:'',goals:[],reminder:null,contacts:[
     {icon:'👩‍⚕️',name:'School Counsellor',sub:'Ms. Reddy · replies in minutes',go:'CALL'},
     {icon:'👤',name:'Trusted contact',sub:'The person you chose to trust',go:'CALL'},
@@ -437,8 +437,11 @@ function migrate(){ /* pull v1 data forward if present */
 }
 migrate();
 var S=store.get()||JSON.parse(JSON.stringify(DEF));
+/* backfill journey start for existing users */
+if(!S.start){S.start=S.checkins.length?S.checkins[0].day:(S.onboarded?dayKey():null);}
 function save(){store.set(S);}
 function firstName(){return S.profile.name?S.profile.name.split(' ')[0]:'friend';}
+function journeyDay(){if(!S.start)return 1;var p=S.start.split('-'),a=new Date(+p[0],+p[1]-1,+p[2]),n=new Date(),b=new Date(n.getFullYear(),n.getMonth(),n.getDate());return Math.max(1,Math.round((b-a)/864e5)+1);}
 
 /* ============ decorations ============ */
 (function(){var c=$('particles'),x=c.getContext('2d'),W,H,ps=[];
@@ -517,7 +520,7 @@ function pickRem(el,i){hap(8);el.parentNode.querySelectorAll('.goal').forEach(fu
 function obNext(){
   if(obI===0){var v=$('nameField').value.trim();if(!v){toast('Add your name to continue');return;}S.profile.name=v;}
   if(obI===1)S.profile.goals=obSel.slice();
-  if(obI===3){S.onboarded=true;save();go('checkin');return;}
+  if(obI===3){S.onboarded=true;S.start=S.start||dayKey();save();go('checkin');setTimeout(function(){toast('🌱 Day 1 of your journey begins');},900);return;}
   obI++;save();renderOb();
 }
 
@@ -548,7 +551,7 @@ function fireRing(id,val){var arc=$(id);if(!arc)return;var c=+arc.getAttribute('
 
 /* ============ TODAY ============ */
 function greetWord(){var h=new Date().getHours();return h<12?'Good morning':h<17?'Good afternoon':'Good evening';}
-function todayLine(){var d=new Date();return d.toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long'});}
+function todayLine(){var d=new Date();return d.toLocaleDateString(undefined,{weekday:'long',day:'numeric',month:'long'});}
 function recoText(){var last=S.checkins[S.checkins.length-1];
   if(!last)return null;
   if(S.profile.goals.indexOf('Sleep better')>=0&&new Date().getHours()>=20)return {i:'🌙',t:'Wind down for deeper sleep',s:'A 2-minute breath before bed helps you fall asleep faster.',fn:"go('breathe')"};
@@ -558,7 +561,7 @@ function recoText(){var last=S.checkins[S.checkins.length-1];
 function renderToday(){
   var b=$('todayBody');var lastToday=S.checkins.filter(function(c){return c.day===dayKey();}).slice(-1)[0];
   var h='<div class="ptr" id="ptr"><span class="spin"></span>Refreshing your day…</div>'+
-  '<div class="t-head"><div><div class="muted" style="font-size:13px">'+greetWord()+' · '+todayLine()+'</div><div class="display" style="margin-top:2px">Hello, '+esc(firstName())+'</div></div>'+
+  '<div class="t-head"><div><div class="muted" style="font-size:13px">'+greetWord()+' · '+todayLine()+'</div><div class="display" style="margin-top:2px">Hello, '+esc(firstName())+'</div><div style="margin-top:8px"><span class="badge bd-strong" style="margin-left:0">🌱 DAY '+journeyDay()+' OF YOUR JOURNEY</span></div></div>'+
   '<button class="t-ava press" aria-label="Profile" onclick="go(\'profile\')">'+esc((S.profile.name||'A').charAt(0).toUpperCase())+'</button></div>';
   if(!S.checkins.length){
     h+='<div class="card" style="margin-top:20px"><div class="empty"><div class="em">🌤️</div><h3>Begin with a check-in</h3><p>Tell AURA how you feel and everything comes to life: your score, patterns and growth tree.</p><button class="btn btn-grad press" onclick="go(\'checkin\')">Check in now · 10 seconds</button></div></div>';
@@ -656,7 +659,7 @@ function renderGratitude(){var l=$('gList');
   l.innerHTML='<div class="lbl" style="margin-bottom:12px">Recent</div>'+S.gratitude.slice(0,6).map(function(e){return '<div class="g-entry"><div class="dt">'+esc(e.dt)+'</div>'+e.items.map(function(v){return '<p>· '+esc(v)+'</p>';}).join('')+'</div>';}).join('');}
 function saveGratitude(){var vals=['g1','g2','g3'].map(function(id){return $(id).value.trim();}).filter(Boolean);
   if(!vals.length){toast('Add at least one 🌱');return;}
-  S.gratitude.unshift({items:vals,dt:new Date().toLocaleDateString('en-IN',{day:'numeric',month:'short'}),ts:Date.now()});save();
+  S.gratitude.unshift({items:vals,dt:new Date().toLocaleDateString(undefined,{day:'numeric',month:'short'}),ts:Date.now()});save();
   ['g1','g2','g3'].forEach(function(id){$(id).value='';});renderGratitude();confetti();toast('Saved 🌸 Your tree grew a little');checkAch();}
 
 /* ============ JOURNEY ============ */
@@ -664,12 +667,12 @@ var jRange='day';
 function setRange(r,btn){jRange=r;hap(8);document.querySelectorAll('#jSeg button').forEach(function(b){b.classList.remove('on');});btn.classList.add('on');renderJourney();}
 function seriesFor(range){ // returns {vals,labels}
   var now=new Date();
-  if(range==='day'){var t=S.checkins.filter(function(c){return c.day===dayKey();});return {vals:t.map(function(c){return c.score;}),labels:t.map(function(c){return new Date(c.ts).toLocaleTimeString('en-IN',{hour:'numeric',minute:'2-digit'});})};}
+  if(range==='day'){var t=S.checkins.filter(function(c){return c.day===dayKey();});return {vals:t.map(function(c){return c.score;}),labels:t.map(function(c){return new Date(c.ts).toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'});})};}
   if(range==='week'){var out=[],lab=[];for(var i=6;i>=0;i--){var d=new Date(now-i*864e5),k=dayKey(d);var day=S.checkins.filter(function(c){return c.day===k;});out.push(day.length?day.reduce(function(a,c){return a+c.score;},0)/day.length:0);lab.push(['S','M','T','W','T','F','S'][d.getDay()]);}return {vals:out,labels:lab};}
   if(range==='month'){var out2=[],lab2=[];for(var w=3;w>=0;w--){var lo=now-((w+1)*7*864e5),hi=now-(w*7*864e5);var seg=S.checkins.filter(function(c){return c.ts>=lo&&c.ts<hi;});out2.push(seg.length?seg.reduce(function(a,c){return a+c.score;},0)/seg.length:0);lab2.push('W'+(4-w));}return {vals:out2,labels:lab2};}
   var out3=[],lab3=[];for(var m=11;m>=0;m--){var d2=new Date(now.getFullYear(),now.getMonth()-m,1),d3=new Date(now.getFullYear(),now.getMonth()-m+1,1);
     var seg2=S.checkins.filter(function(c){return c.ts>=d2.getTime()&&c.ts<d3.getTime();});
-    out3.push(seg2.length?seg2.reduce(function(a,c){return a+c.score;},0)/seg2.length:0);lab3.push(d2.toLocaleDateString('en-IN',{month:'narrow'}));}
+    out3.push(seg2.length?seg2.reduce(function(a,c){return a+c.score;},0)/seg2.length:0);lab3.push(d2.toLocaleDateString(undefined,{month:'narrow'}));}
   return {vals:out3,labels:lab3};}
 function reflection(range){var list=inRange(range);if(!list.length)return null;
   var sc=scoreFrom(list),prev=scoreFrom(prevRange(range));
@@ -696,7 +699,7 @@ function corrCards(){
     return '<div class="corr"><div class="ci">'+icon+'</div><div><b>'+title+'</b><small>'+word.charAt(0).toUpperCase()+word.slice(1)+' link in your data · '+dir+'</small></div><span class="badge '+(mag>.5?'bd-strong':'bd-mod')+'">'+word.toUpperCase()+'</span></div>';}
   return row('🌙','Sleep vs Mood',c1,true)+row('🌬️','Breathing vs Stress',c2,false)+row('📖','Gratitude vs Mood',c3,true);}
 function renderJourney(){
-  var b=$('jBody');
+  var b=$('jBody');$('jDay').textContent='DAY '+journeyDay();
   if(S.checkins.length<1){b.innerHTML='<div class="card"><div class="empty"><div class="em">📊</div><h3>Your Journey starts with data</h3><p>Check in once and this becomes a living picture of your mind: trends, correlations and AI reflections.</p><button class="btn btn-grad press" onclick="go(\'checkin\')">First check-in</button></div></div>';return;}
   b.innerHTML='<div class="card"><div class="skel" style="height:120px"></div></div>';
   setTimeout(function(){
@@ -711,7 +714,7 @@ function renderJourney(){
     var ser=seriesFor(jRange);
     if(jRange==='day'&&list.length){
       h+='<div class="card" style="margin-top:14px"><b>Today\'s timeline</b><div style="margin-top:8px">'+list.map(function(c){
-        return '<div class="tl-item"><div class="tdot">'+({5:'😊',4:'🙂',3:'😐',2:'😔',1:'😰'}[c.score]||'💜')+'</div><div><b>'+c.name+'</b><small>'+new Date(c.ts).toLocaleTimeString('en-IN',{hour:'numeric',minute:'2-digit'})+'</small></div></div>';}).join('')+'</div></div>';
+        return '<div class="tl-item"><div class="tdot">'+({5:'😊',4:'🙂',3:'😐',2:'😔',1:'😰'}[c.score]||'💜')+'</div><div><b>'+c.name+'</b><small>'+new Date(c.ts).toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'})+'</small></div></div>';}).join('')+'</div></div>';
     }else{
       h+='<div class="card" style="margin-top:14px"><div style="display:flex;justify-content:space-between;align-items:center"><b>Mood trend</b><span class="muted" style="font-size:12px">'+({week:'last 7 days',month:'last 4 weeks',year:'last 12 months'}[jRange]||'')+'</span></div><div class="chart" id="jChart"></div></div>';}
     h+='<div class="card" style="margin-top:14px"><b>Correlations</b><div class="muted" style="font-size:12px;margin:3px 0 6px">Computed from your last 14 days</div>'+corrCards()+'</div>';
@@ -769,7 +772,33 @@ function sheetNotif(){openSheet('<h3>Notifications</h3><div class="sub">Gentle n
 function sheetPrivacy(){openSheet('<h3>Privacy</h3><div class="sub">How AURA treats your data.</div><div class="reflect" style="font-size:13.5px;color:var(--muted);line-height:1.7">· Everything you write stays <span class="hl">on this device</span>. There is no server.<br>· Nothing is shared with your school, parents or anyone else.<br>· The coach never judges, and crisis language always surfaces real human help.<br>· You can export or erase everything at any time from this screen.</div>');}
 function sheetContacts(){openSheet('<h3>Emergency contacts</h3><div class="sub">Who appears on your Support screen.</div>'+S.profile.contacts.map(function(c,i){return '<div class="contact" style="cursor:default"><div class="cic">'+c.icon+'</div><div style="flex:1"><b>'+esc(c.name)+'</b><small>'+esc(c.sub)+'</small></div></div>';}).join('')+'<div class="muted" style="font-size:12px;line-height:1.6">Helplines are fixed for your safety. Personal contacts become editable with accounts in the full release.</div>');}
 function sheetExport(){var data=JSON.stringify(S,null,2);
-  openSheet('<h3>Export my data</h3><div class="sub">Your complete AURA record as JSON.</div><textarea class="field" style="height:150px;font-size:11px;margin-top:0" readonly>'+esc(data)+'</textarea><a class="btn btn-grad press" style="display:block;text-align:center;text-decoration:none;margin-top:12px" download="aura-data.json" href="data:application/json;charset=utf-8,'+encodeURIComponent(data)+'">Download JSON</a>');}
+  openSheet('<h3>Export my data</h3><div class="sub">Take your complete AURA record with you.</div>'+
+  '<button class="btn btn-grad press" onclick="exportExcel()">📊 Download Excel (.xlsx)</button>'+
+  '<a class="btn btn-glass press" style="display:block;text-align:center;text-decoration:none;margin-top:10px" download="aura-data.json" href="data:application/json;charset=utf-8,'+encodeURIComponent(data)+'">Download JSON</a>'+
+  '<textarea class="field" style="height:110px;font-size:11px;margin-top:12px" readonly>'+esc(data)+'</textarea>');}
+function exportExcel(){
+  function build(){
+    var wb=XLSX.utils.book_new();
+    var ci=S.checkins.map(function(c){var d=new Date(c.ts);return {'Date':d.toLocaleDateString(),'Time':d.toLocaleTimeString(),'Mood':c.name,'Score (1-5)':c.score,'Journey day':dayN(c.ts)};});
+    XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(ci.length?ci:[{'Date':'','Time':'','Mood':'','Score (1-5)':'','Journey day':''}]),'Check-ins');
+    var gr=S.gratitude.map(function(g){var d=new Date(g.ts);return {'Date':d.toLocaleDateString(),'Entry 1':g.items[0]||'','Entry 2':g.items[1]||'','Entry 3':g.items[2]||''};});
+    XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(gr.length?gr:[{'Date':'','Entry 1':'','Entry 2':'','Entry 3':''}]),'Gratitude');
+    var br=S.breaths.map(function(b){var d=new Date(b);return {'Date':d.toLocaleDateString(),'Time':d.toLocaleTimeString(),'Session':'Box breathing · 2 min'};});
+    XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(br.length?br:[{'Date':'','Time':'','Session':''}]),'Breathing');
+    var days={};Object.keys(S.sleep).forEach(function(k){(days[k]=days[k]||{}).sleep=S.sleep[k].label;});
+    Object.keys(S.energy).forEach(function(k){(days[k]=days[k]||{}).energy=S.energy[k].label;});
+    var dl=Object.keys(days).map(function(k){return {'Day':k,'Sleep':days[k].sleep||'','Energy':days[k].energy||''};});
+    XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(dl.length?dl:[{'Day':'','Sleep':'','Energy':''}]),'Daily logs');
+    var sm=[{'Profile':S.profile.name,'Journey day':journeyDay(),'Check-ins':S.checkins.length,'Gratitude entries':S.gratitude.length,'Breathing sessions':S.breaths.length,'Streak (days)':streak()}];
+    XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(sm),'Summary');
+    XLSX.writeFile(wb,'AURA-data.xlsx');toast('Excel downloaded 📊');
+  }
+  function dayN(ts){if(!S.start)return '';var p=S.start.split('-'),a=new Date(+p[0],+p[1]-1,+p[2]),d=new Date(ts),b=new Date(d.getFullYear(),d.getMonth(),d.getDate());return Math.max(1,Math.round((b-a)/864e5)+1);}
+  if(window.XLSX){build();return;}
+  toast('Preparing Excel…');
+  var sc=document.createElement('script');sc.src='https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+  sc.onload=build;sc.onerror=function(){toast('Excel engine needs internet, JSON still works');};
+  document.head.appendChild(sc);}
 function sheetAbout(){openSheet('<h3>About AURA</h3><div class="sub">Version 2.0 · Prototype</div><div class="reflect" style="font-size:13.5px;color:var(--muted);line-height:1.7">AURA is a student-built emotional wellness companion for LaunchVerse 2026. It exists because asking for help should feel as easy as opening an app.<br><br>Built with care · Made in India 🇮🇳</div>');}
 function doLogout(){S.auth=null;save();closeSheet();chatStarted=false;go('welcome');toast('Logged out. Your data is safe here.');}
 function sheetSwitch(){openSheet('<h3>Switch account</h3><div class="sub">Your current data will be archived on this device and a fresh AURA begins.</div><button class="btn btn-grad press" onclick="doSwitch()">Archive &amp; switch</button><button class="btn btn-ghost" onclick="closeSheet()" style="margin-top:6px">Cancel</button>');}
