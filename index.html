@@ -280,6 +280,26 @@ button{font:inherit;color:inherit;}
 .toast{position:absolute;bottom:100px;left:50%;transform:translateX(-50%) translateY(16px);background:rgba(28,28,36,.94);backdrop-filter:blur(20px);border:1px solid var(--stroke);color:var(--ink);padding:12px 20px;border-radius:20px;font-size:13px;z-index:410;opacity:0;transition:.35s var(--spring);white-space:nowrap;box-shadow:var(--shadow);max-width:86%;overflow:hidden;text-overflow:ellipsis;}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 
+/* therapeutic activities */
+.eq{display:inline-flex;gap:2.5px;align-items:flex-end;height:12px;vertical-align:middle;}
+.eq i{width:3px;border-radius:2px;background:var(--lilac);animation:eqb .9s ease-in-out infinite;height:5px;}
+.eq i:nth-child(2){animation-delay:.2s;}.eq i:nth-child(3){animation-delay:.45s;}
+@keyframes eqb{0%,100%{height:4px;}50%{height:12px;}}
+.scape.playing{border-color:rgba(139,92,246,.5);background:rgba(139,92,246,.12);}
+.playbtn{width:40px;height:40px;border-radius:14px;background:var(--glass2);display:flex;align-items:center;justify-content:center;font-size:14px;flex:0 0 auto;cursor:pointer;border:1px solid var(--stroke);color:var(--ink);}
+.playbtn.on{background:var(--grad);border-color:transparent;box-shadow:0 8px 20px rgba(79,70,229,.45);}
+.heart{margin-left:auto;background:none;border:none;font-size:17px;cursor:pointer;color:var(--faint);transition:transform .2s var(--spring);flex:0 0 auto;padding:6px;}
+.heart.on{color:#fda4af;}
+.heart:active{transform:scale(1.3);}
+#artCanvas{width:100%;height:320px;display:block;border-radius:18px;background:#0f0f14;border:1px solid var(--stroke);touch-action:none;cursor:crosshair;}
+.swrow{display:flex;gap:10px;align-items:center;margin-top:14px;flex-wrap:wrap;}
+.swatch{width:30px;height:30px;border-radius:50%;border:2px solid rgba(255,255,255,.15);cursor:pointer;flex:0 0 auto;transition:transform .2s var(--spring);}
+.swatch.on{border-color:#fff;transform:scale(1.15);}
+.szdot{border-radius:50%;background:var(--muted);cursor:pointer;border:2px solid transparent;flex:0 0 auto;}
+.szdot.on{background:#fff;transform:scale(1.1);}
+.sk-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+.sk-grid img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:14px;border:1px solid var(--stroke);cursor:pointer;display:block;}
+
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;}}
 @media(max-width:900px){.caption{display:none;}}
 @media(max-width:560px){
@@ -393,6 +413,16 @@ button{font:inherit;color:inherit;}
         <div id="sosContacts" style="opacity:.5;pointer-events:none;transition:.5s"></div>
       </section>
 
+      <section class="view" id="music">
+        <div class="topbar"><button class="back" onclick="go('today')" aria-label="Back">‹</button><div><div class="lbl">Therapeutic activities</div><div class="h2">Music Therapy</div></div></div>
+        <div id="musicBody" style="margin-top:10px"></div>
+      </section>
+
+      <section class="view" id="art">
+        <div class="topbar"><button class="back" onclick="go('today')" aria-label="Back">‹</button><div><div class="lbl">Therapeutic activities</div><div class="h2">Art Therapy</div></div></div>
+        <div id="artBody" style="margin-top:10px"></div>
+      </section>
+
       <div class="sheet-wrap" id="sheetWrap"><div class="backdrop" onclick="closeSheet()"></div><div class="sheet" id="sheet"></div></div>
       <div class="toast" id="toast" role="status"></div>
 
@@ -423,7 +453,7 @@ var DEF={v:2,auth:null,onboarded:false,start:null,
     {icon:'👤',name:'Trusted contact',sub:'The person you chose to trust',go:'CALL'},
     {icon:'💚',name:'Tele-MANAS',sub:'Govt. of India · 14416 · 24×7 · free',go:'14416'},
     {icon:'☎️',name:'KIRAN Helpline',sub:'National mental health · 24×7',go:'1800-599-0019'}]},
-  checkins:[],gratitude:[],breaths:[],sleep:{},energy:{},unlocked:{}};
+  checkins:[],gratitude:[],breaths:[],sleep:{},energy:{},unlocked:{},playlist:[],sketches:[]};
 var store={
   get:function(){try{return JSON.parse(localStorage.getItem('aura2')||'null');}catch(e){return window._mem||null;}},
   set:function(s){try{localStorage.setItem('aura2',JSON.stringify(s));}catch(e){window._mem=s;}}
@@ -440,6 +470,7 @@ migrate();
 var S=store.get()||JSON.parse(JSON.stringify(DEF));
 /* backfill journey start for existing users */
 if(!S.start){S.start=S.checkins.length?S.checkins[0].day:(S.onboarded?dayKey():null);}
+if(!S.playlist)S.playlist=[];if(!S.sketches)S.sketches=[];
 function save(){store.set(S);}
 function firstName(){return S.profile.name?S.profile.name.split(' ')[0]:'friend';}
 function journeyDay(){if(!S.start)return 1;var p=S.start.split('-'),a=new Date(+p[0],+p[1]-1,+p[2]),n=new Date(),b=new Date(n.getFullYear(),n.getMonth(),n.getDate());return Math.max(1,Math.round((b-a)/864e5)+1);}
@@ -583,6 +614,10 @@ function renderToday(){
   h+='<div class="rituals">'+
     '<div class="card tap press" onclick="go(\'breathe\')" style="padding:16px"><div style="font-size:23px">🌬️</div><div style="font-weight:600;margin-top:8px">Breathe</div><div class="muted" style="font-size:12px">2-min calm</div></div>'+
     '<div class="card tap press" onclick="go(\'gratitude\')" style="padding:16px"><div style="font-size:23px">📖</div><div style="font-weight:600;margin-top:8px">Gratitude</div><div class="muted" style="font-size:12px">3 good things</div></div></div>'+
+  '<div class="lbl" style="margin:22px 0 0">Therapeutic activities</div>'+
+  '<div class="rituals" style="margin-top:12px">'+
+    '<div class="card tap press" onclick="go(\'music\')" style="padding:16px"><div style="font-size:23px">🎵</div><div style="font-weight:600;margin-top:8px">Music Therapy</div><div class="muted" style="font-size:12px">Soundscapes for your mood</div></div>'+
+    '<div class="card tap press" onclick="go(\'art\')" style="padding:16px"><div style="font-size:23px">🎨</div><div style="font-weight:600;margin-top:8px">Art Therapy</div><div class="muted" style="font-size:12px">Draw how you feel</div></div></div>'+
   '<div class="card tap press" onclick="go(\'support\')" style="margin-top:14px;padding:15px 18px"><div class="moodline"><div class="dot" style="background:var(--glass2)">💚</div><div><div style="font-weight:600;font-size:14px">Need someone right now?</div><div class="muted" style="font-size:12px">Counsellor, trusted adult and 24×7 helplines</div></div><span style="margin-left:auto;color:var(--faint)">›</span></div></div>';
   b.innerHTML=h;
   if(S.checkins.length){fireRing('todayRing',scoreFrom(lastN(S.checkins,7)));
@@ -825,8 +860,160 @@ renderSOS();
   hold.addEventListener('mousedown',begin);hold.addEventListener('touchstart',function(e){e.preventDefault();begin();},{passive:false});
   ['mouseup','mouseleave','touchend'].forEach(function(ev){hold.addEventListener(ev,cancel);});})();
 
+/* ============ MUSIC THERAPY ============ */
+var AC=null,curSound=null,nowPlaying=null;
+function audioC(){AC=AC||new (window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume();return AC;}
+function noiseBuf(a){var len=a.sampleRate*2,b=a.createBuffer(1,len,a.sampleRate),d=b.getChannelData(0);for(var i=0;i<len;i++)d[i]=Math.random()*2-1;return b;}
+function makeScape(kind){
+  var a=audioC(),m=a.createGain();m.gain.value=0;m.connect(a.destination);
+  var stops=[],timers=[];
+  function noiseVia(type,freq,gain,q){var n=a.createBufferSource();n.buffer=noiseBuf(a);n.loop=true;
+    var f=a.createBiquadFilter();f.type=type;f.frequency.value=freq;if(q)f.Q.value=q;
+    var g=a.createGain();g.gain.value=gain;n.connect(f);f.connect(g);g.connect(m);n.start();stops.push(n);return g;}
+  function chirp(){var o=a.createOscillator(),g=a.createGain(),t0=a.currentTime,f0=1800+Math.random()*1500;
+    o.type='sine';o.frequency.setValueAtTime(f0,t0);o.frequency.exponentialRampToValueAtTime(f0*1.6,t0+.12);
+    g.gain.setValueAtTime(0,t0);g.gain.linearRampToValueAtTime(.05,t0+.03);g.gain.exponentialRampToValueAtTime(.001,t0+.25);
+    o.connect(g);g.connect(m);o.start(t0);o.stop(t0+.3);}
+  if(kind==='white')noiseVia('lowpass',16000,.12);
+  if(kind==='rain'){noiseVia('bandpass',900,.4,.6);noiseVia('lowpass',300,.12);}
+  if(kind==='ocean'){var og=noiseVia('lowpass',380,.22);var lfo=a.createOscillator(),lg=a.createGain();lfo.frequency.value=.12;lg.gain.value=.14;lfo.connect(lg);lg.connect(og.gain);lfo.start();stops.push(lfo);}
+  if(kind==='forest'){noiseVia('lowpass',700,.08);timers.push(setInterval(function(){if(Math.random()<.7)chirp();},1800));}
+  if(kind==='nature'){var ng=noiseVia('lowpass',900,.1);var l2=a.createOscillator(),lg2=a.createGain();l2.frequency.value=.07;lg2.gain.value=.05;l2.connect(lg2);lg2.connect(ng.gain);l2.start();stops.push(l2);timers.push(setInterval(function(){if(Math.random()<.4)chirp();},2600));}
+  m.gain.linearRampToValueAtTime(.9,a.currentTime+1.2);
+  return {stop:function(){try{m.gain.linearRampToValueAtTime(0,a.currentTime+.3);}catch(e){}timers.forEach(clearInterval);
+    setTimeout(function(){stops.forEach(function(n){try{n.stop();}catch(e){}});try{m.disconnect();}catch(e){}},420);}};}
+function makePad(root){
+  var a=audioC(),m=a.createGain();m.gain.value=0;m.connect(a.destination);
+  var oscs=[];[root,root*1.25,root*1.5,root*2].forEach(function(f,i){
+    var o=a.createOscillator();o.type=i===3?'sine':'triangle';o.frequency.value=f;o.detune.value=Math.random()*6-3;
+    var g=a.createGain();g.gain.value=i===3?.015:.045;o.connect(g);g.connect(m);o.start();oscs.push(o);});
+  var lfo=a.createOscillator(),lg=a.createGain();lfo.frequency.value=.15;lg.gain.value=.18;lfo.connect(lg);lg.connect(m.gain);lfo.start();oscs.push(lfo);
+  m.gain.linearRampToValueAtTime(.65,a.currentTime+1.5);
+  return {stop:function(){try{m.gain.linearRampToValueAtTime(0,a.currentTime+.4);}catch(e){}
+    setTimeout(function(){oscs.forEach(function(o){try{o.stop();}catch(e){}});try{m.disconnect();}catch(e){}},520);}};}
+var SCAPES=[{id:'rain',icon:'🌧️',name:'Rain',sub:'Steady and soft'},{id:'ocean',icon:'🌊',name:'Ocean',sub:'Slow waves'},{id:'forest',icon:'🌲',name:'Forest',sub:'Leaves and birds'},{id:'white',icon:'📻',name:'White Noise',sub:'Pure focus'},{id:'pad',icon:'🎹',name:'Instrumental',sub:'Warm ambient pad'},{id:'nature',icon:'🌿',name:'Nature',sub:'Open air'}];
+var TRACKS={
+  happy:[{id:'h1',t:'Golden Hour',s:'Warm keys',f:261.6},{id:'h2',t:'Light Steps',s:'Soft melody',f:293.7},{id:'h3',t:'Open Sky',s:'Bright pad',f:246.9}],
+  calm:[{id:'c1',t:'Weightless Drift',s:'Slow ambient',f:196},{id:'c2',t:'Moonlit Water',s:'Piano pad',f:220},{id:'c3',t:'Slow Horizon',s:'Deep ambient',f:174.6}],
+  low:[{id:'l1',t:'Gentle Hold',s:'Comfort pad',f:174.6},{id:'l2',t:'Warm Blanket',s:'Low strings',f:164.8},{id:'l3',t:'Quiet Company',s:'Slow piano',f:196}],
+  anxious:[{id:'a1',t:'Slow Breath',s:'Deep calm',f:216},{id:'a2',t:'Grounding',s:'Soft drone',f:146.8},{id:'a3',t:'Untangle',s:'Minimal keys',f:185}]};
+function moodBucket(){var last=S.checkins[S.checkins.length-1];if(!last)return 'calm';
+  return last.name==='Anxious'?'anxious':last.score>=4?'happy':last.score===3?'calm':'low';}
+function trackById(id){var r=null;Object.keys(TRACKS).forEach(function(k){TRACKS[k].forEach(function(t){if(t.id===id)r=t;});});return r;}
+function stopSound(){if(curSound){try{curSound.stop();}catch(e){}}curSound=null;nowPlaying=null;}
+function playScape(id){if(nowPlaying==='s:'+id){stopSound();renderMusic();return;}
+  stopSound();curSound=id==='pad'?makePad(220):makeScape(id);nowPlaying='s:'+id;hap(10);renderMusic();}
+function playTrack(id){if(nowPlaying==='t:'+id){stopSound();renderMusic();return;}
+  stopSound();var t=trackById(id);if(!t)return;curSound=makePad(t.f);nowPlaying='t:'+id;hap(10);renderMusic();}
+function inPlaylist(key){return S.playlist.some(function(p){return p.key===key;});}
+function togglePl(key,title,icon,kind){
+  var idx=-1;S.playlist.forEach(function(p,i){if(p.key===key)idx=i;});
+  if(idx>=0){S.playlist.splice(idx,1);toast('Removed from playlist');}
+  else{S.playlist.push({key:key,title:title,icon:icon,kind:kind});hap(10);toast('Added to your Calm Playlist ♥');}
+  save();renderMusic();}
+function renderMusic(){
+  var b=$('musicBody');if(!b)return;
+  var bucket=moodBucket(),bl={happy:'Happy',calm:'Calm',low:'Low',anxious:'Anxious'}[bucket];
+  var h='<div class="card"><div class="lbl">For your mood · '+bl+'</div><div class="muted" style="font-size:12.5px;margin:4px 0 4px">'+(S.checkins.length?'Picked from your last check-in':'Check in and these adapt to you')+'</div>';
+  TRACKS[bucket].forEach(function(t){var on=nowPlaying==='t:'+t.id,sv=inPlaylist('t:'+t.id);
+    h+='<div class="corr"><div class="playbtn press '+(on?'on':'')+'" role="button" aria-label="Play" data-act="track" data-id="'+t.id+'">'+(on?'❚❚':'▶')+'</div><div style="flex:1;min-width:0"><b>'+t.t+'</b><small>'+t.s+(on?' · <span class="eq"><i></i><i></i><i></i></span>':'')+'</small></div><button class="heart press '+(sv?'on':'')+'" aria-label="Save to playlist" data-act="saveT" data-id="'+t.id+'">'+(sv?'♥':'♡')+'</button></div>';});
+  h+='</div><div class="lbl" style="margin:20px 0 0">Soundscapes</div><div class="rituals" style="margin-top:12px">';
+  SCAPES.forEach(function(s){var on=nowPlaying==='s:'+s.id,sv=inPlaylist('s:'+s.id);
+    h+='<div class="card tap press scape '+(on?'playing':'')+'" data-act="scape" data-id="'+s.id+'" style="padding:16px"><div style="display:flex;justify-content:space-between;align-items:flex-start"><span style="font-size:23px">'+s.icon+'</span><button class="heart press '+(sv?'on':'')+'" aria-label="Save" data-act="saveS" data-id="'+s.id+'" style="margin:-6px -6px 0 0">'+(sv?'♥':'♡')+'</button></div><div style="font-weight:600;margin-top:6px">'+s.name+'</div><small class="muted">'+(on?'<span class="eq"><i></i><i></i><i></i></span> playing':s.sub)+'</small></div>';});
+  h+='</div><div class="card" style="margin-top:14px"><b>Your Calm Playlist</b>';
+  if(!S.playlist.length)h+='<div class="empty" style="padding:14px 6px 2px"><div class="em">♡</div><h3 style="font-size:16px">Nothing saved yet</h3><p style="margin-bottom:0">Tap the hearts to build your own calm collection.</p></div>';
+  else S.playlist.forEach(function(p){var on=nowPlaying===p.key;
+    h+='<div class="corr"><div class="playbtn press '+(on?'on':'')+'" data-act="pl" data-key="'+p.key+'">'+(on?'❚❚':'▶')+'</div><div style="flex:1"><b>'+p.icon+' '+esc(p.title)+'</b><small>'+(p.kind==='s'?'Soundscape':'Track')+'</small></div><button class="heart on press" aria-label="Remove" data-act="rm" data-key="'+p.key+'">✕</button></div>';});
+  h+='</div><div class="muted" style="font-size:11.5px;text-align:center;margin-top:14px">Sounds are generated on your device 🎧 Headphones recommended</div>';
+  b.innerHTML=h;
+  b.onclick=function(e){var el=e.target.closest('[data-act]');if(!el)return;
+    var act=el.dataset.act,id=el.dataset.id,key=el.dataset.key;
+    if(act==='track')playTrack(id);
+    else if(act==='scape')playScape(id);
+    else if(act==='saveT'){var t=trackById(id);togglePl('t:'+id,t.t,'🎵','t');}
+    else if(act==='saveS'){var sp=SCAPES.filter(function(x){return x.id===id;})[0];togglePl('s:'+id,sp.name,sp.icon,'s');}
+    else if(act==='pl'){key.charAt(0)==='s'?playScape(key.slice(2)):playTrack(key.slice(2));}
+    else if(act==='rm')togglePl(key);};}
+
+/* ============ ART THERAPY ============ */
+var ART_PROMPTS={
+  happy:['Draw today as a sunrise. What colours does it deserve?','Sketch the moment that made you smile, just shapes and colour.','Fill the canvas with your energy right now, no rules.'],
+  calm:['Draw slow circles that breathe with you.','Sketch a place where your mind feels quiet.','Trace the shape of calm, let lines flow without lifting.'],
+  low:['Draw the heaviness as a shape, then draw something gently holding it.','Colour the feeling, then add one small light to the canvas.','Sketch a safe place, real or imagined.'],
+  anxious:['Draw your worry as weather, then let it drift across the canvas.','Scribble the tension out, then soften it with slow circles.','Draw a container, and place the racing thoughts inside it.']};
+function artPrompt(){var arr=ART_PROMPTS[moodBucket()]||ART_PROMPTS.calm;return arr[Math.floor(Math.random()*arr.length)];}
+var ART_COLORS=['#C4B5FD','#8B5CF6','#60A5FA','#34D399','#FBBF24','#FB7185','#F6F6F9'];
+var artColor='#C4B5FD',artSize=4,artMode='draw',acv,aX,artW=0,artH=320,artLast=null;
+function initArtCanvas(){
+  acv=$('artCanvas');if(!acv)return;
+  var dpr=Math.min(window.devicePixelRatio||1,2);artW=acv.offsetWidth||300;
+  acv.width=artW*dpr;acv.height=artH*dpr;aX=acv.getContext('2d');aX.scale(dpr,dpr);
+  aX.lineCap='round';aX.lineJoin='round';clearArt();
+  function pt(e){var r=acv.getBoundingClientRect();return [e.clientX-r.left,e.clientY-r.top];}
+  acv.onpointerdown=function(e){e.preventDefault();try{acv.setPointerCapture(e.pointerId);}catch(x){}artLast=pt(e);artSeg(artLast,artLast);};
+  acv.onpointermove=function(e){if(!artLast)return;var p=pt(e);artSeg(artLast,p);artLast=p;};
+  acv.onpointerup=acv.onpointercancel=function(){artLast=null;};}
+function rotP(p,cx,cy,an){var dx=p[0]-cx,dy=p[1]-cy,c=Math.cos(an),s=Math.sin(an);return [cx+dx*c-dy*s,cy+dx*s+dy*c];}
+function artSeg(a,b){
+  if(!aX)return;
+  aX.strokeStyle=artMode==='erase'?'#0f0f14':artColor;
+  aX.lineWidth=artMode==='erase'?artSize*4:artSize;
+  function ln(p,q){aX.beginPath();aX.moveTo(p[0],p[1]);aX.lineTo(q[0],q[1]);aX.stroke();}
+  if(artMode==='mandala'){var cx=artW/2,cy=artH/2;
+    for(var k=0;k<8;k++){var an=k*Math.PI/4,p0=rotP(a,cx,cy,an),p1=rotP(b,cx,cy,an);
+      ln(p0,p1);ln([2*cx-p0[0],p0[1]],[2*cx-p1[0],p1[1]]);}}
+  else ln(a,b);}
+function clearArt(){if(!aX)return;aX.fillStyle='#0f0f14';aX.fillRect(0,0,artW,artH);}
+function drawGuide(){if(!aX)return;
+  var cx=artW/2,cy=artH/2;aX.strokeStyle='rgba(255,255,255,.10)';aX.lineWidth=1.5;
+  [28,58,88,118,145].forEach(function(r){aX.beginPath();aX.arc(cx,cy,r,0,Math.PI*2);aX.stroke();});
+  for(var k=0;k<12;k++){var an=k*Math.PI/6;aX.beginPath();aX.moveTo(cx+28*Math.cos(an),cy+28*Math.sin(an));aX.lineTo(cx+145*Math.cos(an),cy+145*Math.sin(an));aX.stroke();}
+  for(var j=0;j<12;j++){var a2=j*Math.PI/6+Math.PI/12;aX.beginPath();aX.arc(cx+103*Math.cos(a2),cy+103*Math.sin(a2),13,0,Math.PI*2);aX.stroke();}
+  toast('Colour inside the mandala 🌸');}
+function saveSketch(){
+  if(!acv)return;
+  var tmp=document.createElement('canvas');tmp.width=360;tmp.height=Math.round(360*artH/artW);
+  tmp.getContext('2d').drawImage(acv,0,0,tmp.width,tmp.height);
+  var img=tmp.toDataURL('image/jpeg',.62);
+  var last=S.checkins[S.checkins.length-1];
+  S.sketches.unshift({img:img,dt:new Date().toLocaleDateString(),mood:last?last.name:''});
+  S.sketches=S.sketches.slice(0,12);save();confetti();toast('Saved to your sketch journal 🎨');renderArt();}
+function viewSketch(i){var s=S.sketches[i];if(!s)return;
+  openSheet('<h3>Sketch</h3><div class="sub">'+esc(s.dt)+(s.mood?' · feeling '+esc(s.mood):'')+'</div><img style="width:100%;border-radius:16px;border:1px solid var(--stroke)" src="'+s.img+'" alt="Saved sketch"><button class="btn btn-danger press" style="margin-top:14px" onclick="delSketch('+i+')">Delete sketch</button>');}
+function delSketch(i){S.sketches.splice(i,1);save();closeSheet();renderArt();toast('Deleted');}
+function renderArt(){
+  var b=$('artBody');if(!b)return;
+  var h='<div class="card"><div class="lbl">Guided prompt · your mood</div><div id="artPromptTxt" style="font-size:15px;font-weight:600;line-height:1.55;margin-top:8px">'+artPrompt()+'</div><div style="margin-top:12px"><button class="chip press" data-act="newPrompt">🎲 New prompt</button></div></div>';
+  h+='<div class="card" style="margin-top:14px"><div style="display:flex;gap:8px;flex-wrap:wrap">'+
+    '<button class="chip press mode-c on" data-act="mode" data-id="draw">✏️ Draw</button>'+
+    '<button class="chip press mode-c" data-act="mode" data-id="mandala">🌸 Mandala</button>'+
+    '<button class="chip press mode-c" data-act="mode" data-id="erase">⬜ Erase</button>'+
+    '<button class="chip press" data-act="guide">🖼️ Colouring guide</button></div>'+
+    '<div class="swrow">'+ART_COLORS.map(function(c){return '<div class="swatch press '+(c===artColor?'on':'')+'" data-act="color" data-id="'+c+'" style="background:'+c+'"></div>';}).join('')+
+    '<span style="width:6px"></span>'+[4,8,14].map(function(s){return '<div class="szdot press '+(s===artSize?'on':'')+'" data-act="size" data-id="'+s+'" style="width:'+(10+s)+'px;height:'+(10+s)+'px"></div>';}).join('')+'</div>'+
+    '<canvas id="artCanvas" style="margin-top:14px" aria-label="Drawing canvas"></canvas>'+
+    '<div style="display:flex;gap:10px;margin-top:12px"><button class="btn btn-glass press" style="flex:1" data-act="clear">Clear</button><button class="btn btn-grad press" style="flex:1.4" data-act="saveSk">Save to journal</button></div></div>';
+  h+='<div class="lbl" style="margin:20px 0 0">Sketch journal</div>';
+  if(!S.sketches.length)h+='<div class="card" style="margin-top:12px"><div class="empty" style="padding:14px 6px 2px"><div class="em">🎨</div><h3 style="font-size:16px">Your visual diary awaits</h3><p style="margin-bottom:0">Draw how you feel and save it. Feelings you can see are easier to understand.</p></div></div>';
+  else h+='<div class="sk-grid" style="margin-top:12px">'+S.sketches.map(function(s,i){return '<img src="'+s.img+'" data-act="view" data-id="'+i+'" alt="Sketch from '+esc(s.dt)+'">';}).join('')+'</div>';
+  b.innerHTML=h;initArtCanvas();
+  b.onclick=function(e){var el=e.target.closest('[data-act]');if(!el)return;
+    var act=el.dataset.act,id=el.dataset.id;
+    if(act==='newPrompt')$('artPromptTxt').textContent=artPrompt();
+    else if(act==='mode'){artMode=id;b.querySelectorAll('.mode-c').forEach(function(c){c.classList.toggle('on',c.dataset.id===id);});hap(8);}
+    else if(act==='color'){artColor=id;if(artMode==='erase'){artMode='draw';b.querySelectorAll('.mode-c').forEach(function(c){c.classList.toggle('on',c.dataset.id==='draw');});}b.querySelectorAll('.swatch').forEach(function(c){c.classList.toggle('on',c.dataset.id===id);});}
+    else if(act==='size'){artSize=+id;b.querySelectorAll('.szdot').forEach(function(c){c.classList.toggle('on',+c.dataset.id===artSize);});}
+    else if(act==='guide')drawGuide();
+    else if(act==='clear'){clearArt();toast('Fresh canvas');}
+    else if(act==='saveSk')saveSketch();
+    else if(act==='view')viewSketch(+id);};}
+
 /* gratitude list on open */
-var _go=go;go=function(id){_go(id);if(id==='gratitude')renderGratitude();};
+var _go=go;go=function(id){_go(id);
+  if(id==='gratitude')renderGratitude();
+  if(id==='music')renderMusic();
+  if(id==='art')renderArt();
+  if(id!=='music'&&nowPlaying){stopSound();}};
 
 /* PWA: installable app + offline support */
 if('serviceWorker' in navigator && location.protocol==='https:'){
